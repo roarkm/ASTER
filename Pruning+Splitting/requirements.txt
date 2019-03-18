@@ -1,0 +1,6 @@
+nltk==3.4
+numpy==1.16.2
+pkg-resources==0.0.0
+regex==2019.3.12
+singledispatch==3.4.0.3
+six==1.12.0
