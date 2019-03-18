@@ -7,12 +7,15 @@ import tempfile
 from nltk import compat
 import re
 
-stanford_dir = "/mnt/sdb1/Pipeline/tools/stanford/stanford-corenlp-full-2016-10-31"
+stanford_dir = "/home/m/dev/stanford-corenlp-full-2018-10-05"
+# TODO: locate models dir/file (i.e. '/edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 models = "/mnt/sdb1/Pipeline/tools/stanford/stanford-english-corenlp-2016-10-31-models"
-CURR_DIR = "/mnt/sdb1/Dropbox (GaTech)/Chicken/BootstrappedRL/"
-input_file = CURR_DIR+ 'miniSents.txt' #'SCIFI-CORPUS-noQuotes.txt'
-output_file = CURR_DIR+ 'miniSents-parsed.txt' #'scifi_parsed.txt'
-sentence_file = CURR_DIR+ 'miniSents-sentences.txt' #'scifi_sentences.txt'
+
+# TODO: locate appropriate 'miniSents.txt' file. This is the raw movie-summary text from wikipedia?
+WORK_DIR      = "/home/m/dev/ASTER/ps-work"
+input_file    = WORK_DIR + 'miniSents.txt' #'SCIFI-CORPUS-noQuotes.txt'
+output_file   = WORK_DIR + 'miniSents-parsed.txt' #'scifi_parsed.txt'
+sentence_file = WORK_DIR + 'miniSents-sentences.txt' #'scifi_sentences.txt'
 
 def removePunct(sentence):
 	final_sentences = []
