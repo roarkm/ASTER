@@ -7,10 +7,14 @@ Download raw data here http://www.cs.cmu.edu/~ark/personas/
 corenlp.py runs without error with a dummy miniSents.txt file in ps-work dir, however
 the generated file miniSents-parsed.txt appears to contain no useful information
 (although it's too soon for me to interpret).
-`python dataCleaning.py` produces
-IOError: No such file or directory: '/mnt/sdb1/Pipeline/tools/verbnet'
 
-TODO: discover / locate the intended verbnet file.
+`python dataCleaning.py` errors on
+File "/home/m/dev/ASTER/Pruning+Splitting/eventmakerTryServer.py", line 282, in getEvent
+(bottom of stack trace: ValueError: No JSON object could be decoded).
+This might be related to miniSents-parsed.txt being empty as mentioned above?
+(try running on a movie plot summary)
+
+TODO: investigate the above error.
 
 ## Dependencies
 **Stanford CoreNLP Server**
