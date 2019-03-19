@@ -22,10 +22,13 @@ from numpy.random import choice
 from nltk.wsd import lesk
 
 # necessary parameters
-stanford_dir = "/mnt/sdb1/Pipeline/tools/stanford/stanford-corenlp-full-2016-10-31"
-models = "/mnt/sdb1/Pipeline/tools/stanford/stanford-english-corenlp-2016-10-31-models"
+stanford_dir = "/home/m/dev/stanford-corenlp-full-2018-10-05"
+models       = "/home/m/dev/coreNLP-support"
+
+# TODO: locate / identify file: 'stanford-ner-2016-10-31'
 ner_loc = "/mnt/sdb1/Pipeline/tools/stanford/stanford-ner-2016-10-31"
 
+# TODO: locate / identify file: '/mnt/sdb1/Pipeline/tools/verbnet'
 verbnet = nltk.corpus.VerbnetCorpusReader('/mnt/sdb1/Pipeline/tools/verbnet',
     ['absorb-39.8.xml', 'continue-55.3.xml', 'hurt-40.8.3.xml', 'remove-10.1.xml', 'accept-77.xml',
     'contribute-13.2.xml', 'illustrate-25.3.xml', 'render-29.90.xml', 'accompany-51.7.xml',

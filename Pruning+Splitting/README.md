@@ -2,6 +2,16 @@
 Data pre-processing.
 Download raw data here http://www.cs.cmu.edu/~ark/personas/
 
+## Current Status
+
+corenlp.py runs without error with a dummy miniSents.txt file in ps-work dir, however
+the generated file miniSents-parsed.txt appears to contain no useful information
+(although it's too soon for me to interpret).
+`python dataCleaning.py` produces
+IOError: No such file or directory: '/mnt/sdb1/Pipeline/tools/verbnet'
+
+TODO: discover / locate the intended verbnet file.
+
 ## Dependencies
 **Stanford CoreNLP Server**
 Attempting to run using 2018-10-05 release (original work used 2016-10-31 release).
@@ -9,7 +19,7 @@ TODO: confirm 2018 release compatibility.
 
 `sudo apt install openjdk-11-jdk-headless`
 
-`java -version` (version 10.0)
+`java -version` # version 10.0
 
 `cd ~/dev`
 
@@ -31,7 +41,8 @@ corenlp.py expects to find englishPCFG.ser.gz so extract it (will update path st
 
 `unzip stanford-corenlp-3.9.2-models.jar`
 
-`find . | grep PCFG`
+`find . | grep PCFG` # ./edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz
+
 
 ## Usage
 **Install & Setup**
