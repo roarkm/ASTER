@@ -28,8 +28,7 @@ models       = "/home/m/dev/coreNLP-support"
 # TODO: locate / identify file: 'stanford-ner-2016-10-31'
 ner_loc = "/mnt/sdb1/Pipeline/tools/stanford/stanford-ner-2016-10-31"
 
-# TODO: locate / identify file: '/mnt/sdb1/Pipeline/tools/verbnet'
-verbnet = nltk.corpus.VerbnetCorpusReader('/mnt/sdb1/Pipeline/tools/verbnet',
+verbnet = nltk.corpus.VerbnetCorpusReader('/home/m/dev/coreNLP-support/verbnet',
     ['absorb-39.8.xml', 'continue-55.3.xml', 'hurt-40.8.3.xml', 'remove-10.1.xml', 'accept-77.xml',
     'contribute-13.2.xml', 'illustrate-25.3.xml', 'render-29.90.xml', 'accompany-51.7.xml',
     'convert-26.6.2.xml', 'image_impression-25.1.xml', 'require-103.xml', 'acquiesce-95.xml',

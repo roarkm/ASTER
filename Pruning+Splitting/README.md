@@ -43,6 +43,17 @@ corenlp.py expects to find englishPCFG.ser.gz so extract it (will update path st
 
 `find . | grep PCFG` # ./edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz
 
+**VerbNet**
+`cd ~/dev/coreNLP-support`
+
+`wget http://verbs.colorado.edu/verbnet_downloads/vn_3_14.zip`
+
+`unzip vn_3_14.zip`
+
+`cd verbnet && cp pronounce-29.3.1 pronounce-29.3.1.xml` # misnamed file?
+
+
+
 
 ## Usage
 **Install & Setup**
