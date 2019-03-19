@@ -4,6 +4,9 @@ Download raw data here http://www.cs.cmu.edu/~ark/personas/
 
 ## Dependencies
 **Stanford CoreNLP Server**
+Attempting to run using 2018-10-05 release (original work used 2016-10-31 release).
+TODO: confirm 2018 release compatibility.
+
 `sudo apt install openjdk-11-jdk-headless`
 
 `java -version` (version 10.0)
@@ -18,10 +21,17 @@ Download raw data here http://www.cs.cmu.edu/~ark/personas/
 
 `source /etc/environments`
 
-`cd stanford-corenlp-full-2018-10-05`
+corenlp.py expects to find englishPCFG.ser.gz so extract it (will update path strings in corenlp.py)
 
-Attempting to run using 2018-10-05 release (original work used 2016-10-31 release).
-TODO: confirm 2018 release compatibility.
+`mkdir coreNLP-support`
+
+`cp stanford-corenlp-full-2018-10-05/stanford-corenlp-3.9.2-models.jar coreNLP-support`
+
+`cd coreNLP-support`
+
+`unzip stanford-corenlp-3.9.2-models.jar`
+
+`find . | grep PCFG`
 
 ## Usage
 **Install & Setup**

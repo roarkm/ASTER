@@ -8,8 +8,7 @@ from nltk import compat
 import re
 
 stanford_dir = "/home/m/dev/stanford-corenlp-full-2018-10-05"
-# TODO: locate models dir/file (i.e. '/edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
-models = "/mnt/sdb1/Pipeline/tools/stanford/stanford-english-corenlp-2016-10-31-models"
+models       = "/home/m/dev/coreNLP-support"
 
 # TODO: locate appropriate 'miniSents.txt' file. This is the raw movie-summary text from wikipedia?
 WORK_DIR      = "/home/m/dev/ASTER/ps-work"
