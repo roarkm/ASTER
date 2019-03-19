@@ -11,7 +11,7 @@ stanford_dir = "/home/m/dev/stanford-corenlp-full-2018-10-05"
 models       = "/home/m/dev/coreNLP-support"
 
 # TODO: locate appropriate 'miniSents.txt' file. This is the raw movie-summary text from wikipedia?
-WORK_DIR      = "/home/m/dev/ASTER/ps-work"
+WORK_DIR      = "/home/m/dev/ASTER/ps-work/"
 input_file    = WORK_DIR + 'miniSents.txt' #'SCIFI-CORPUS-noQuotes.txt'
 output_file   = WORK_DIR + 'miniSents-parsed.txt' #'scifi_parsed.txt'
 sentence_file = WORK_DIR + 'miniSents-sentences.txt' #'scifi_sentences.txt'
