@@ -1,23 +1,32 @@
 # Pruning and Splitting
+
 Data pre-processing.
-Download raw data here http://www.cs.cmu.edu/~ark/personas/
 
 ## Current Status
 
-corenlp.py runs without error with a dummy miniSents.txt file in ps-work dir, however
-the generated file miniSents-parsed.txt appears to contain no useful information
-(although it's too soon for me to interpret).
+corenlp.py runs without error using either a dummy miniSents.txt file or plot_summaries.txt
+as input, however the generated file miniSents-parsed.txt appears to contain no useful information;
+i.e.`python corenlp.py` produces a miniSents-parsed.txt file with empty parses.
 
 `python dataCleaning.py` errors on
 File "/home/m/dev/ASTER/Pruning+Splitting/eventmakerTryServer.py", line 282, in getEvent
 (bottom of stack trace: ValueError: No JSON object could be decoded).
-This might be related to miniSents-parsed.txt being empty as mentioned above?
-(try running on a movie plot summary)
+This might be related to miniSents-parsed.txt having empty parses as mentioned above?
 
 TODO: investigate the above error.
 
 ## Dependencies
+**Corpus Text**
+Original paper used raw text from http://www.cs.cmu.edu/~ark/personas/
+
+`wget http://www.cs.cmu.edu/~ark/personas/data/MovieSummaries.tar.gz`
+
+`tar xf MovieSummaries.tar.gz`
+
+`cp MovieSummaries/plot_summaries.txt ASTER/ps-work`
+
 **Stanford CoreNLP Server**
+
 Attempting to run using 2018-10-05 release (original work used 2016-10-31 release).
 TODO: confirm 2018 release compatibility.
 
@@ -48,6 +57,7 @@ corenlp.py expects to find englishPCFG.ser.gz so extract it (will update path st
 `find . | grep PCFG` # ./edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz
 
 **VerbNet**
+
 The discovery of verbnet dir inside the Event_Creation dir makes the following
 installation unecessary (probably).
 
@@ -59,22 +69,29 @@ installation unecessary (probably).
 
 `cd verbnet && cp pronounce-29.3.1 pronounce-29.3.1.xml` # misnamed file?
 
+**Stanford Named Entity Recognition (NER)**
 
+`cd ~/dev/coreNLP-support`
 
+`wget https://nlp.stanford.edu/software/stanford-ner-2018-10-16.zip`
+
+`unzip stanford-ner-2018-10-16.zip`
 
 ## Usage
 **Install & Setup**
+
 `virtualenv --system-site-packages -p python2.7 .venv && source .venv/bin/activate && pip install -r requirements.txt`
 
 **Running**
+
+After install use the standard `source .venv/bin/activate` and `deactivate` virtualenv helpers.
+
 To start a Stanford CoreNLP server, run: `sh runNLPserver.sh`. (visit http://localhost:9000 to test)
 
-Start virtualenv session with `source .venv/bin/activate`.
-
-TODO: edit coreNLP dir paths in eventmakerTryServer.py (maybe refactor into environment variables or
-config script/file).
+Note: Running stanford-coreNLP server as a separate process appears to be unecessary;
+P&S code spawns a new java process for each sentence.
+This is an inefficient usage do process creation overhead but gets the job done.
+We can investigate refactoring the code to make API calls over http.
 
 Run `python corenlp.py` to parse your data and then you can run `python dataCleaning.py`
 to prune and split.
-
-`deactivate`

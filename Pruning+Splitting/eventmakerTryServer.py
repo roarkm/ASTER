@@ -22,11 +22,9 @@ from numpy.random import choice
 from nltk.wsd import lesk
 
 # necessary parameters
-stanford_dir = "/home/m/dev/stanford-corenlp-full-2018-10-05"
-models       = "/home/m/dev/coreNLP-support"
-
-# TODO: locate / identify file: 'stanford-ner-2016-10-31'
-ner_loc = "/mnt/sdb1/Pipeline/tools/stanford/stanford-ner-2016-10-31"
+stanford_dir = "../../stanford-corenlp-full-2018-10-05"
+models       = "../../coreNLP-support"
+ner_loc      = "../../coreNLP-support/stanford-ner-2018-10-16"
 
 verbnet = nltk.corpus.VerbnetCorpusReader('../Event_Creation/verbnet',
     ['absorb-39.8.xml', 'continue-55.3.xml', 'hurt-40.8.3.xml', 'remove-10.1.xml', 'accept-77.xml',
@@ -226,8 +224,8 @@ class eventMaker:
 			out = out.replace(b'\xa0',b' ')
 			out = out.replace(b'NLP>',b'')
 			#print(out)
-			out = out.decode(encoding)
-			#print(out)
+			# out = out.decode(encoding)
+                        # print(out)
 		os.unlink(input_file.name)
 		# Return java configurations to their default values.
 		config_java(options=default_options, verbose=False)
@@ -269,7 +267,7 @@ class eventMaker:
 	# This is a function that can extract the event format from the sentence given.
 		words = self.sentence.split()
 		original_sent = self.sentence.strip()
-		print(original_sent)
+		# print(original_sent)
 		#ner = self.callStanfordNER(original_sent).split() # get the name entities in the sentence
 		#ner_dict = {} # Example: "Sally":"PERSON"
 		#for pair in ner:
@@ -278,7 +276,7 @@ class eventMaker:
 		#print(ner_dict)
 
 		json_data = self.callStanford(self.sentence)
-		#print(type(json_data))
+                # print(type(json_data))
 		d = json.loads(json_data)
 		all_json = d["sentences"]
 		ner_dict2 = {}

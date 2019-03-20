@@ -7,15 +7,21 @@ import tempfile
 from nltk import compat
 import re
 
-stanford_dir = "/home/m/dev/stanford-corenlp-full-2018-10-05"
-models       = "/home/m/dev/coreNLP-support"
+stanford_dir = "../../stanford-corenlp-full-2018-10-05"
+models       = "../../coreNLP-support"
 
 # TODO: Tested on dummy 'miniSents.txt' file (with some simple sentences).
 # This should be the raw movie-summary text from wikipedia?
-WORK_DIR      = "/home/m/dev/ASTER/ps-work/"
-input_file    = WORK_DIR + 'miniSents.txt' #'SCIFI-CORPUS-noQuotes.txt'
+WORK_DIR      = "../../ASTER/ps-work/"
+input_file    = WORK_DIR + 'plot_summaries.txt' # cp from http://www.cs.cmu.edu/~ark/personas/
+# input_file    = WORK_DIR + 'miniSents.txt' #'SCIFI-CORPUS-noQuotes.txt'
 output_file   = WORK_DIR + 'miniSents-parsed.txt' #'scifi_parsed.txt'
 sentence_file = WORK_DIR + 'miniSents-sentences.txt' #'scifi_sentences.txt'
+
+# sentence_postfix = "-sentences.txt"
+# output_postfix   = "-parsed.txt"
+# output_file   = WORK_DIR + input_file + output_postfix
+# sentence_file = WORK_DIR + input_file + sentence_postfix
 
 def removePunct(sentence):
 	final_sentences = []
