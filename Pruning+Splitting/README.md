@@ -48,6 +48,9 @@ corenlp.py expects to find englishPCFG.ser.gz so extract it (will update path st
 `find . | grep PCFG` # ./edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz
 
 **VerbNet**
+The discovery of verbnet dir inside the Event_Creation dir makes the following
+installation unecessary (probably).
+
 `cd ~/dev/coreNLP-support`
 
 `wget http://verbs.colorado.edu/verbnet_downloads/vn_3_14.zip`
