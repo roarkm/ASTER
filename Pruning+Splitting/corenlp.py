@@ -7,12 +7,13 @@ import tempfile
 from nltk import compat
 import re
 
-stanford_dir = "../../stanford-corenlp-full-2018-10-05"
-models       = "../../coreNLP-support"
+stanford_dir = "/home/matthieu/Project/corenlp/stanford-corenlp-full-2018-10-05"
+models       = "/home/matthieu/Project/corenlp/coreNLP-support"
 
 # TODO: Tested on dummy 'miniSents.txt' file (with some simple sentences).
 # This should be the raw movie-summary text from wikipedia?
 WORK_DIR      = "../../ASTER/ps-work/"
+# input_file    = WORK_DIR + 'plot_summaries2.txt' # cp from http://www.cs.cmu.edu/~ark/personas/
 input_file    = WORK_DIR + 'plot_summaries.txt' # cp from http://www.cs.cmu.edu/~ark/personas/
 # input_file    = WORK_DIR + 'miniSents.txt' #'SCIFI-CORPUS-noQuotes.txt'
 output_file   = WORK_DIR + 'miniSents-parsed.txt' #'scifi_parsed.txt'
@@ -85,7 +86,7 @@ def callStanford(sentence):
         '-outputFormat','json',
         "-parse.flags", "",
         '-encoding', encoding,
-        '-model', models+'/edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz',"-backends","localhost:9001,12"]
+        '-model', models+'/edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz',"-backends","localhost:9000,12"]
     input_ = ""
     default_options = ' '.join(_java_options)
     with tempfile.NamedTemporaryFile(mode='wb', delete=False) as temp_file:
@@ -124,4 +125,3 @@ for line in open(input_file, 'r').readlines():
 write_file.write("]\n}") ###MAKE SURE TO GET RID OF THAT LAST ,
 write_file.close()
 sent_file.close()
-
