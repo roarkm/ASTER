@@ -4,7 +4,7 @@ Data pre-processing.
 
 ## Current Status
 
-corenlp.py runs without error using either a dummy miniSents.txt file or plot_summaries.txt
+`python corenlp.py` runs without error using either a dummy miniSents.txt file or plot_summaries.txt
 as input, however the generated file miniSents-parsed.txt appears to contain no useful information;
 i.e.`python corenlp.py` produces a miniSents-parsed.txt file with empty parses.
 
@@ -34,15 +34,15 @@ TODO: confirm 2018 release compatibility.
 
 `java -version` # version 10.0
 
+`echo 'JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64/bin/java"' | sudo tee --append /etc/environment`
+
+`source /etc/environment`
+
 `cd ~/dev`
 
 `wget http://nlp.stanford.edu/software/stanford-corenlp-full-2018-10-05.zip`
 
 `unzip stanford-corenlp-full-2018-10-05.zip`
-
-`echo 'JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64/bin/java"' | sudo tee --append /etc/environment`
-
-`source /etc/environments`
 
 corenlp.py expects to find englishPCFG.ser.gz so extract it (will update path strings in corenlp.py)
 
