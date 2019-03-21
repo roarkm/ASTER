@@ -1,4 +1,4 @@
-# This is a class to extract events from sentences, store words in a working memory and ?translate back to human readable 
+# This is a class to extract events from sentences, store words in a working memory and ?translate back to human readable
 # sentences from partially generalized sentences.
 from nltk.tag.stanford import StanfordNERTagger
 import nltk.tag.stanford as stanford
@@ -22,9 +22,9 @@ from numpy.random import choice
 from nltk.wsd import lesk
 
 # necessary parameters
-stanford_dir = "../../stanford-corenlp-full-2018-10-05"
-models       = "../../coreNLP-support"
-ner_loc      = "../../coreNLP-support/stanford-ner-2018-10-16"
+stanford_dir = "/home/matthieu/Project/corenlp/stanford-corenlp-full-2018-10-05"
+models       = "/home/matthieu/Project/corenlp/coreNLP-support"
+ner_loc      = "/home/matthieu/Project/corenlp/coreNLP-support/stanford-ner-2018-10-16"
 
 verbnet = nltk.corpus.VerbnetCorpusReader('../Event_Creation/verbnet',
     ['absorb-39.8.xml', 'continue-55.3.xml', 'hurt-40.8.3.xml', 'remove-10.1.xml', 'accept-77.xml',
@@ -92,7 +92,7 @@ verbnet = nltk.corpus.VerbnetCorpusReader('../Event_Creation/verbnet',
     'consume-66.xml', 'hold-15.1.xml', 'rely-70.xml', 'contiguous_location-47.8.xml',
     'hunt-35.1.xml', 'remedy-45.7.xml'])
 
-class eventMaker: 
+class eventMaker:
     def __init__(self,sentence):
         self.sentence = sentence
         self.nouns = defaultdict(list)
@@ -102,7 +102,7 @@ class eventMaker:
 
     def lookupNoun(self,word, pos, original_sent):
         #print(word, pos)
-        # This is a function that supports generalize_noun function 
+        # This is a function that supports generalize_noun function
         if len(wn.synsets(word)) > 0:
             #word1 = lesk(original_sent.split(), word, pos='n')  #word1 is the first synonym of word
             #print(word1)
@@ -111,17 +111,17 @@ class eventMaker:
             return word.lower()
     def lookupAdj(self,word, pos, original_sent):
         #print(word, pos)
-        # This is a function that supports generalize_noun function 
+        # This is a function that supports generalize_noun function
         if len(wn.synsets(word)) > 0:
             #word1 = lesk(original_sent.split(), word, pos='n')  #word1 is the first synonym of word
             #print(word1)
             return str(lesk(original_sent.split(), word, pos='a'))
         else:
-            return word.lower() 
+            return word.lower()
         '''
         hyper = lambda s: s.hypernyms()
         TREE = word1.tree(hyper, depth=6)
-        temp_tree = TREE        
+        temp_tree = TREE
         for i in range(2):
             try:
                 temp_tree = temp_tree[1]
@@ -146,7 +146,7 @@ class eventMaker:
                     named_entities.append(word)
                 resultString = "<NE>"+str(named_entities.index(word))
             else:
-                resultString = ner 
+                resultString = ner
         else:
             word = lemma
             if "NN" in pos: # and adjective? #changed from only "NN"
@@ -163,7 +163,7 @@ class eventMaker:
                 elif word == "they" or word == "them":
                     resultString = "Synset('physical_entity.n.01')"
                 else:
-                    resultString = "Synset('entity.n.01')" 
+                    resultString = "Synset('entity.n.01')"
             else:
                 resultString = word
         return resultString, named_entities
@@ -172,7 +172,7 @@ class eventMaker:
     def generalize_verb(self,word,tokens):
         # This function is to support getEvent functions. Tokens have specific format:tokens[word] = [lemma, POS, NER]
         word = tokens[word][0]
-        if word == "have": return "own-100" 
+        if word == "have": return "own-100"
 
         classids = verbnet.classids(word)
         if len(classids) > 0:
@@ -194,7 +194,7 @@ class eventMaker:
         encoding = "utf8"
         '''cmd = ["java", "-cp", stanford_dir+"/*","-Xmx20g",
             "edu.stanford.nlp.pipeline.StanfordCoreNLP",
-            "-annotators", "tokenize,ssplit,pos,lemma,depparse,ner", 
+            "-annotators", "tokenize,ssplit,pos,lemma,depparse,ner",
             "-nthreads","10",
             '-outputFormat', 'json',
             "-parse.flags", "",
@@ -287,11 +287,11 @@ class eventMaker:
 
         #print(all_json)
         #print(len(all_json))
-    
+
         for sent_num, sentence in enumerate(all_json): # for each sentence in the entire input
-            tokens = defaultdict(list) 
+            tokens = defaultdict(list)
             #print(sentence)
-            for token in sentence["tokens"]: 
+            for token in sentence["tokens"]:
                 tokens[token["word"]] = [token["lemma"], token["pos"], ner_dict2[token["word"]],token["index"]] # each word in the dictionary has a list of [lemma, POS, NER]
 
 
@@ -309,7 +309,7 @@ class eventMaker:
             # create events
             for d in deps:
                 #subject
-                if 'nsubj' in d["dep"] and "RB" not in tokens[d["dependentGloss"]][1]: #adjective? #"csubj" identifies a lot of things wrong 
+                if 'nsubj' in d["dep"] and "RB" not in tokens[d["dependentGloss"]][1]: #adjective? #"csubj" identifies a lot of things wrong
                     #print(tokens[d["dependentGloss"]][1])
                     if d["governorGloss"] not in verbs:
                         #create new event
@@ -323,7 +323,7 @@ class eventMaker:
                         modifiers.append('EmptyParameter')
                         objects.append('EmptyParameter')
                     elif d["governorGloss"] in verbs:
-                        if subjects[verbs.index(d["governorGloss"])] == "EmptyParameter": # if verb alrady exist 
+                        if subjects[verbs.index(d["governorGloss"])] == "EmptyParameter": # if verb alrady exist
                             subjects[verbs.index(d["governorGloss"])] = d["dependentGloss"]
                             index[d["dependentGloss"]] = d["dependent"]
                         else:
@@ -370,12 +370,12 @@ class eventMaker:
                         temp_verbs = copy.deepcopy(verbs)
                         for i, verb in enumerate(temp_verbs):
                             if match_verb == verb: # what if the verb appears more than one times?
-                                subjects.append(subjects[i]) 
+                                subjects.append(subjects[i])
                                 verbs.append(verb)
                                 modifiers.append('EmptyParameter')
                                 objects.append(d["dependentGloss"])
                                 index[d["dependentGloss"]] = d["dependent"]
-                        pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]           
+                        pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
                     # case 1: obj
                     elif 'dobj' in d["dep"] or 'xcomp' == d["dep"]:  #?? 'xcomp' is a little bit tricky
                         if d["governorGloss"] in verbs:
@@ -400,7 +400,7 @@ class eventMaker:
                                 modifiers[verbs.index(v)] = d["dependentGloss"]
                                 index[d["dependentGloss"]] = d["dependent"]
                                 pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
-                    # PRP           
+                    # PRP
                     elif ('nmod' in d["dep"] or 'ccomp' in d["dep"] or 'iobj' in d["dep"] or 'dep' in d["dep"]) and 'PRP' in tokens[d["dependentGloss"]][1]:
                         if d["governorGloss"] in verbs: # how about PRP?
                             #modify that modifier
@@ -418,7 +418,7 @@ class eventMaker:
 
 
 
-                
+
             # generalize the words and store them in instance variables
             for (a,b,c,d) in zip(subjects, verbs, objects, modifiers):
                 pos1 = "None"
@@ -461,7 +461,7 @@ class eventMaker:
                         self.nouns[c1].append(tokens[c][0])
                 else:
                     c1 = c
-                if d == 'EmptyParameter': #adding new lines start. 
+                if d == 'EmptyParameter': #adding new lines start.
                     label = 'EmptyParameter'
                 else:
                     label = 'None' #change from Exist
@@ -480,7 +480,7 @@ class eventMaker:
                                 label = dep["dep"].split(":")[1]
                             num = dep['dependent']
                             #print(dep)
-                                
+
                     for dep in deps:
                         if "case" in dep["dep"] and d == dep["governorGloss"] and num == dep['governor']: # #what if modifier is related to multiple labels?
                             label = dep["dependentGloss"]   #adding new lines end
@@ -498,7 +498,7 @@ class eventMaker:
                     else:
                         self.nouns[d1].append(tokens[d][0])
                 else:
-                    d1 = d  
+                    d1 = d
                 if label != "EmtpyParameter" and label != "None":
                     if len(tokens[label]) == 4:
                         #print(tokens[label])
@@ -528,4 +528,3 @@ for event in maker.events:
     f.write(sentence+" @@@@ "+line)
 quit()
     #print(sentence+"@@@@"+line)
-
