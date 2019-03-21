@@ -85,74 +85,74 @@ verbnet = nltk.corpus.VerbnetCorpusReader('./verbnet',
     'hunt-35.1.xml', 'remedy-45.7.xml'])
 
 def generalize_verb(word,tokens):
-	#tokens[word] = [lemma, POS, NER]
-	word = tokens[word][0]
-	if word == "have": return "own-100" #most likely not "consume"
-	classids = verbnet.classids(word)
-	if len(classids) > 0:
-		#return choice based on weight of number of members
-		mems = []
-		for classid in classids:
-			vnclass = verbnet.vnclass(classid)
-			num = len(list(vnclass.findall('MEMBERS/MEMBER')))
-			mems.append(num)
-		mem_count = mems
-		mems = [x/float(sum(mem_count)) for x in mems]
-		return str(choice(classids, 1, p=mems)[0])
-	else:
-		return word
+    #tokens[word] = [lemma, POS, NER]
+    word = tokens[word][0]
+    if word == "have": return "own-100" #most likely not "consume"
+    classids = verbnet.classids(word)
+    if len(classids) > 0:
+        #return choice based on weight of number of members
+        mems = []
+        for classid in classids:
+            vnclass = verbnet.vnclass(classid)
+            num = len(list(vnclass.findall('MEMBERS/MEMBER')))
+            mems.append(num)
+        mem_count = mems
+        mems = [x/float(sum(mem_count)) for x in mems]
+        return str(choice(classids, 1, p=mems)[0])
+    else:
+        return word
 
 
 #NOUNS
 def lookupNoun(word):
-	result = ""
-	if len(wn.synsets(word)) > 0:
-		word1 = wn.synsets(word)[0]
-	else:
-		return word.lower()
-	hyper = lambda s: s.hypernyms()
-	TREE = word1.tree(hyper, depth=6)
-	#pprint(TREE)
-	temp_tree = TREE
-	for i in range(2): #each word should have at least 2-3 levels
-		try:
-			temp_tree = temp_tree[1]
-		except:
-			break
-	#print(temp_tree[0])
-	result = temp_tree[0]
-	return str(result)
+    result = ""
+    if len(wn.synsets(word)) > 0:
+        word1 = wn.synsets(word)[0]
+    else:
+        return word.lower()
+    hyper = lambda s: s.hypernyms()
+    TREE = word1.tree(hyper, depth=6)
+    #pprint(TREE)
+    temp_tree = TREE
+    for i in range(2): #each word should have at least 2-3 levels
+        try:
+            temp_tree = temp_tree[1]
+        except:
+            break
+    #print(temp_tree[0])
+    result = temp_tree[0]
+    return str(result)
 
 def generalize_noun(word, tokens, named_entities):
-	lemma = tokens[word][0]
-	pos = tokens[word][1]
-	ner = tokens[word][2]
-	resultString = ""
-	if ner != "O":
-		if ner == "PERSON":
-			if word not in named_entities:
-				named_entities.append(word)
-			resultString = "<NE>"+str(named_entities.index(word))
-		else:
-			resultString = ner #location or something
-	else:
-		word = lemma
-		if "NN" in pos:
-			resultString = lookupNoun(word)
-		elif "PRP" in pos:
-			if word == "he" or word == "him":
-				resultString = "Synset('male.n.02')"
-			elif word == "she" or word == "her":
-				resultString = "Synset('female.n.02')"
-			elif word == "I" or word == "me" or word == "we" or word == "us":
-				resultString = "Synset('person.n.01')"
-			elif word == "they" or word == "them":
-				resultString = "Synset('physical_entity.n.01')"
-			else:
-				resultString = "Synset('entity.n.01')" ##
-		else:
-			resultString = word
-	return resultString, named_entities
+    lemma = tokens[word][0]
+    pos = tokens[word][1]
+    ner = tokens[word][2]
+    resultString = ""
+    if ner != "O":
+        if ner == "PERSON":
+            if word not in named_entities:
+                named_entities.append(word)
+            resultString = "<NE>"+str(named_entities.index(word))
+        else:
+            resultString = ner #location or something
+    else:
+        word = lemma
+        if "NN" in pos:
+            resultString = lookupNoun(word)
+        elif "PRP" in pos:
+            if word == "he" or word == "him":
+                resultString = "Synset('male.n.02')"
+            elif word == "she" or word == "her":
+                resultString = "Synset('female.n.02')"
+            elif word == "I" or word == "me" or word == "we" or word == "us":
+                resultString = "Synset('person.n.01')"
+            elif word == "they" or word == "them":
+                resultString = "Synset('physical_entity.n.01')"
+            else:
+                resultString = "Synset('entity.n.01')" ##
+        else:
+            resultString = word
+    return resultString, named_entities
 
 
 
@@ -167,144 +167,144 @@ ner = [line.strip().split(' ') for line in ner_file.readlines()]
 original_sents = [" ".join([word.split("/")[0] for word in sentence]) for sentence in ner]
 ner_dict = [] #json sentence index should match up with sentence index here; list of dictionaries with {word:label} pairs for each sentence
 for sent in ner:
-	tiny_dict = defaultdict(str)
-	for pair in sent:
-		word, label = pair.rsplit("/", 1)
-		tiny_dict[word] = label
-	ner_dict.append(tiny_dict)
+    tiny_dict = defaultdict(str)
+    for pair in sent:
+        word, label = pair.rsplit("/", 1)
+        tiny_dict[word] = label
+    ner_dict.append(tiny_dict)
 
 with open(json_file) as json_data:
-	d = json.load(json_data)
-	all_json = d["sentences"]
-	#story_count = 0
-	outfile = open("genre_"+str(genreNum)+"_events.txt", "w")
-	
-	for sent_num, sentence in enumerate(all_json): # for each sentence in the entire genre
-		new_story = False
-		tokens = defaultdict(list)#TODO: atm, assuming same POS for same word in sentence
+    d = json.load(json_data)
+    all_json = d["sentences"]
+    #story_count = 0
+    outfile = open("genre_"+str(genreNum)+"_events.txt", "w")
+    
+    for sent_num, sentence in enumerate(all_json): # for each sentence in the entire genre
+        new_story = False
+        tokens = defaultdict(list)#TODO: atm, assuming same POS for same word in sentence
 
-		#from "tokens", put "word" into dictionary & store "lemma", "pos", and get ner from other file
-		for token in sentence["tokens"]:
-			#each word in the dictionary has a list of [lemma, POS, NER]
-			tokens[token["word"]] = [token["lemma"], token["pos"], ner_dict[sentence["index"]][token["word"]] ]
+        #from "tokens", put "word" into dictionary & store "lemma", "pos", and get ner from other file
+        for token in sentence["tokens"]:
+            #each word in the dictionary has a list of [lemma, POS, NER]
+            tokens[token["word"]] = [token["lemma"], token["pos"], ner_dict[sentence["index"]][token["word"]] ]
 
-			#stories split when last word's "after" is "\n"
-			if "\n" in token["after"]:
-				new_story=True
+            #stories split when last word's "after" is "\n"
+            if "\n" in token["after"]:
+                new_story=True
 
-		deps = sentence["enhancedPlusPlusDependencies"]	
-		named_entities = []
-		conj = defaultdict(str)
+        deps = sentence["enhancedPlusPlusDependencies"] 
+        named_entities = []
+        conj = defaultdict(str)
 
-		#Shruti's version
-		verbs = []
-		subjects = []
-		modifiers = []
-		objects = []
-		negs = []
-		pos = {}
-		#chaining of mods
-		chainMods = {}
-
-
-		# create events
-		for d in deps:
-			#[(d["governorGloss"],tokens[d["governorGloss"]][1]), d["dep"], (d["dependentGloss"],tokens[d["dependentGloss"]][1])]
-			#subject
-			if 'subj' in d["dep"]:
-				if d["governorGloss"] not in verbs:
-					#create new event
-					if not "VB" in tokens[d["governorGloss"]][1]: continue
-					verbs.append(d["governorGloss"])
-					subjects.append(d["dependentGloss"])
-					pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
-					modifiers.append('EmptyParameter')
-					objects.append('EmptyParameter')
-				elif d["governorGloss"] in verbs:
-					if subjects[verbs.index(d["governorGloss"])] == "EmptyParameter":
-						subjects[verbs.index(d["governorGloss"])] = d["dependentGloss"]
-					else:
-						subjects.append(d["dependentGloss"])
-						verbs.append(d["governorGloss"])
-						modifiers.append('EmptyParameter')
-						objects.append('EmptyParameter')
-					pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
-				elif d["dependentGloss"] in subjects:
-					verbs[subjects.index(d["dependentGloss"])] = d["governorGloss"]
-					pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
-			else: #check to see if we have a subject filled
-				if len(subjects) >1:
-					if subjects[-1] == "EmptyParameter":
-						subjects[-1] = subjects[-2]
-				#conjunction of subjects
-				if 'conj' in d["dep"] and 'VB' in tokens[d["dependentGloss"]][1]:
-					if d["dependentGloss"] not in verbs:
-						verbs.append(d["dependentGloss"])
-						subjects.append('EmptyParameter')
-						modifiers.append('EmptyParameter')
-						objects.append('EmptyParameter')
-				#conjunction of verbs
-				elif 'conj' in d["dep"] and d["governorGloss"] in subjects:
-					loc = subjects.index(d["governorGloss"])
-					verb = verbs[loc]
-					subjects.append(d["dependentGloss"])
-					verbs.append(verb)
-					modifiers.append('EmptyParameter')
-					objects.append('EmptyParameter')
-					pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
-				elif 'conj' in d["dep"] and d["governorGloss"] in objects:
-					loc = objects.index(d["governorGloss"])
-					match_verb = verbs[loc]
-					#print(match_verb)
-					temp_verbs = copy.deepcopy(verbs)
-					for i, verb in enumerate(temp_verbs):
-						if match_verb == verb:
-							subjects.append(subjects[i])
-							verbs.append(verb)
-							modifiers.append('EmptyParameter')
-							objects.append(d["dependentGloss"])
-					pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]			
-				# case 1: obj
-				elif 'dobj' in d["dep"] or 'xcomp' == d["dep"]:
-					if d["governorGloss"] in verbs:
-						#modify that object
-						pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
-						for i, verb in reversed(list(enumerate(verbs))):
-							if verb == d["governorGloss"] and objects[i] == "EmptyParameter":
-								objects[i] = d["dependentGloss"]
-				# case 2: nmod
-				elif ('nmod' in d["dep"] or 'ccomp' in d["dep"] or 'iobj' in d["dep"] or 'dep' in d["dep"]) and 'NN' in tokens[d["dependentGloss"]][1]:
-					if d["governorGloss"] in verbs:
-						#modify that modifier
-						for i, verb in reversed(list(enumerate(verbs))):
-							if verb == d["governorGloss"] and modifiers[i] == "EmptyParameter":
-								modifiers[i] = d["dependentGloss"]
-						pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
-					elif d["governorGloss"] in chainMods:
-						v = chainMods[d["governorGloss"]]
-						if v in verbs:
-							modifiers[verbs.index(v)] = d["dependentGloss"]
-							pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
+        #Shruti's version
+        verbs = []
+        subjects = []
+        modifiers = []
+        objects = []
+        negs = []
+        pos = {}
+        #chaining of mods
+        chainMods = {}
 
 
-		for (a,b,c,d) in zip(subjects, verbs, objects, modifiers):
-			if a != 'EmptyParameter':
-				a1, named_entities = generalize_noun(a, tokens, named_entities)
-			else:
-				a1 = a
-			if b != 'EmptyParameter':
-				b1 = generalize_verb(b, tokens)
-			else:
-				b1 = b
-			if c != 'EmptyParameter':
-				c1, named_entities = generalize_noun(c, tokens, named_entities)
-			else:
-				c1 = c
-			if d != 'EmptyParameter':
-				d1, named_entities = generalize_noun(d, tokens, named_entities)
-			else:
-				d1 = d
-			output_str = " ".join([a1,b1,c1,d1])+";"+original_sents[sent_num]+"\n"
-			outfile.write(output_str)
-		if new_story:
-			outfile.write("<EOS>\n")
+        # create events
+        for d in deps:
+            #[(d["governorGloss"],tokens[d["governorGloss"]][1]), d["dep"], (d["dependentGloss"],tokens[d["dependentGloss"]][1])]
+            #subject
+            if 'subj' in d["dep"]:
+                if d["governorGloss"] not in verbs:
+                    #create new event
+                    if not "VB" in tokens[d["governorGloss"]][1]: continue
+                    verbs.append(d["governorGloss"])
+                    subjects.append(d["dependentGloss"])
+                    pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
+                    modifiers.append('EmptyParameter')
+                    objects.append('EmptyParameter')
+                elif d["governorGloss"] in verbs:
+                    if subjects[verbs.index(d["governorGloss"])] == "EmptyParameter":
+                        subjects[verbs.index(d["governorGloss"])] = d["dependentGloss"]
+                    else:
+                        subjects.append(d["dependentGloss"])
+                        verbs.append(d["governorGloss"])
+                        modifiers.append('EmptyParameter')
+                        objects.append('EmptyParameter')
+                    pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
+                elif d["dependentGloss"] in subjects:
+                    verbs[subjects.index(d["dependentGloss"])] = d["governorGloss"]
+                    pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
+            else: #check to see if we have a subject filled
+                if len(subjects) >1:
+                    if subjects[-1] == "EmptyParameter":
+                        subjects[-1] = subjects[-2]
+                #conjunction of subjects
+                if 'conj' in d["dep"] and 'VB' in tokens[d["dependentGloss"]][1]:
+                    if d["dependentGloss"] not in verbs:
+                        verbs.append(d["dependentGloss"])
+                        subjects.append('EmptyParameter')
+                        modifiers.append('EmptyParameter')
+                        objects.append('EmptyParameter')
+                #conjunction of verbs
+                elif 'conj' in d["dep"] and d["governorGloss"] in subjects:
+                    loc = subjects.index(d["governorGloss"])
+                    verb = verbs[loc]
+                    subjects.append(d["dependentGloss"])
+                    verbs.append(verb)
+                    modifiers.append('EmptyParameter')
+                    objects.append('EmptyParameter')
+                    pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
+                elif 'conj' in d["dep"] and d["governorGloss"] in objects:
+                    loc = objects.index(d["governorGloss"])
+                    match_verb = verbs[loc]
+                    #print(match_verb)
+                    temp_verbs = copy.deepcopy(verbs)
+                    for i, verb in enumerate(temp_verbs):
+                        if match_verb == verb:
+                            subjects.append(subjects[i])
+                            verbs.append(verb)
+                            modifiers.append('EmptyParameter')
+                            objects.append(d["dependentGloss"])
+                    pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]           
+                # case 1: obj
+                elif 'dobj' in d["dep"] or 'xcomp' == d["dep"]:
+                    if d["governorGloss"] in verbs:
+                        #modify that object
+                        pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
+                        for i, verb in reversed(list(enumerate(verbs))):
+                            if verb == d["governorGloss"] and objects[i] == "EmptyParameter":
+                                objects[i] = d["dependentGloss"]
+                # case 2: nmod
+                elif ('nmod' in d["dep"] or 'ccomp' in d["dep"] or 'iobj' in d["dep"] or 'dep' in d["dep"]) and 'NN' in tokens[d["dependentGloss"]][1]:
+                    if d["governorGloss"] in verbs:
+                        #modify that modifier
+                        for i, verb in reversed(list(enumerate(verbs))):
+                            if verb == d["governorGloss"] and modifiers[i] == "EmptyParameter":
+                                modifiers[i] = d["dependentGloss"]
+                        pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
+                    elif d["governorGloss"] in chainMods:
+                        v = chainMods[d["governorGloss"]]
+                        if v in verbs:
+                            modifiers[verbs.index(v)] = d["dependentGloss"]
+                            pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
+
+
+        for (a,b,c,d) in zip(subjects, verbs, objects, modifiers):
+            if a != 'EmptyParameter':
+                a1, named_entities = generalize_noun(a, tokens, named_entities)
+            else:
+                a1 = a
+            if b != 'EmptyParameter':
+                b1 = generalize_verb(b, tokens)
+            else:
+                b1 = b
+            if c != 'EmptyParameter':
+                c1, named_entities = generalize_noun(c, tokens, named_entities)
+            else:
+                c1 = c
+            if d != 'EmptyParameter':
+                d1, named_entities = generalize_noun(d, tokens, named_entities)
+            else:
+                d1 = d
+            output_str = " ".join([a1,b1,c1,d1])+";"+original_sents[sent_num]+"\n"
+            outfile.write(output_str)
+        if new_story:
+            outfile.write("<EOS>\n")

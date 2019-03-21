@@ -252,7 +252,7 @@ class Seq2SeqModel(object):
     else:
       #return outputs[0], outputs[1], outputs[2:]
       return None, outputs[0], outputs[1:]  # No gradient norm, loss, outputs.
-	
+    
   def get_batch(self, data, bucket_id, pos):
     """Get a random batch of data from the specified bucket, prepare for step.
 

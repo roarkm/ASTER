@@ -20,8 +20,8 @@ model.fit_transform(matrix)
 topic_word = model.topic_word_
 n_top_words = 25
 for i, topic_dist in enumerate(topic_word):
-	topic_words = np.array(vocab)[np.argsort(topic_dist)][:-(n_top_words+1):-1]
-	print('Topic {}: {}'.format(i, ' '.join(topic_words)))
+    topic_words = np.array(vocab)[np.argsort(topic_dist)][:-(n_top_words+1):-1]
+    print('Topic {}: {}'.format(i, ' '.join(topic_words)))
 
 output = open('lda_model_CMU_100_1500.pkl', 'wb')
 pickle.dump(model, output)

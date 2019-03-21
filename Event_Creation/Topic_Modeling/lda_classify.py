@@ -13,4 +13,4 @@ matrix = tf.fit_transform(test)
 
 doc_topic_test = model.transform(matrix)
 for sent_num, topics in enumerate(doc_topic_test):
-	print("{} (top topic: {})".format(sent_num,topics.argmax()))
+    print("{} (top topic: {})".format(sent_num,topics.argmax()))
