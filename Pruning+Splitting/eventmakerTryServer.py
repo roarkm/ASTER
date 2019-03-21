@@ -93,428 +93,428 @@ verbnet = nltk.corpus.VerbnetCorpusReader('../Event_Creation/verbnet',
     'hunt-35.1.xml', 'remedy-45.7.xml'])
 
 class eventMaker: 
-	def __init__(self,sentence):
-		self.sentence = sentence
-		self.nouns = defaultdict(list)
-		self.verbs = defaultdict(list)
-		self.events = []
+    def __init__(self,sentence):
+        self.sentence = sentence
+        self.nouns = defaultdict(list)
+        self.verbs = defaultdict(list)
+        self.events = []
 
 
-	def lookupNoun(self,word, pos, original_sent):
-		#print(word, pos)
-		# This is a function that supports generalize_noun function 
-		if len(wn.synsets(word)) > 0:
-			#word1 = lesk(original_sent.split(), word, pos='n')  #word1 is the first synonym of word
-			#print(word1)
-			return str(lesk(original_sent.split(), word, pos='n'))
-		else:
-			return word.lower()
-	def lookupAdj(self,word, pos, original_sent):
-		#print(word, pos)
-		# This is a function that supports generalize_noun function 
-		if len(wn.synsets(word)) > 0:
-			#word1 = lesk(original_sent.split(), word, pos='n')  #word1 is the first synonym of word
-			#print(word1)
-			return str(lesk(original_sent.split(), word, pos='a'))
-		else:
-			return word.lower()	
-		'''
-		hyper = lambda s: s.hypernyms()
-		TREE = word1.tree(hyper, depth=6)
-		temp_tree = TREE		
-		for i in range(2):
-			try:
-				temp_tree = temp_tree[1]
-			except:
-				break
-		result = temp_tree[0]
+    def lookupNoun(self,word, pos, original_sent):
+        #print(word, pos)
+        # This is a function that supports generalize_noun function 
+        if len(wn.synsets(word)) > 0:
+            #word1 = lesk(original_sent.split(), word, pos='n')  #word1 is the first synonym of word
+            #print(word1)
+            return str(lesk(original_sent.split(), word, pos='n'))
+        else:
+            return word.lower()
+    def lookupAdj(self,word, pos, original_sent):
+        #print(word, pos)
+        # This is a function that supports generalize_noun function 
+        if len(wn.synsets(word)) > 0:
+            #word1 = lesk(original_sent.split(), word, pos='n')  #word1 is the first synonym of word
+            #print(word1)
+            return str(lesk(original_sent.split(), word, pos='a'))
+        else:
+            return word.lower() 
+        '''
+        hyper = lambda s: s.hypernyms()
+        TREE = word1.tree(hyper, depth=6)
+        temp_tree = TREE        
+        for i in range(2):
+            try:
+                temp_tree = temp_tree[1]
+            except:
+                break
+        result = temp_tree[0]
 
-		return str(result)
-		'''
-
-
-	def generalize_noun(self, word, tokens, named_entities, original_sent):
-		# This function is to support getEvent functions. Tokens have specific format(lemma, pos, ner)
-		lemma = tokens[word][0]
-		pos = tokens[word][1]
-		ner = tokens[word][2]
-		resultString = ""
-
-		if ner != "O": # output of Stanford NER: default values is "O"
-			if ner == "PERSON":
-				if word not in named_entities: # named_entities is a list to store the names of people
-					named_entities.append(word)
-				resultString = "<NE>"+str(named_entities.index(word))
-			else:
-				resultString = ner 
-		else:
-			word = lemma
-			if "NN" in pos: # and adjective? #changed from only "NN"
-				resultString = self.lookupNoun(word, pos, original_sent) # get the word's ancestor
-			elif "JJ" in pos:
-				resultString = self.lookupAdj(word, pos, original_sent)
-			elif "PRP" in pos:
-				if word == "he" or word == "him":
-					resultString = "Synset('male.n.02')"
-				elif word == "she" or word == "her":
-					resultString = "Synset('female.n.02')"
-				elif word == "I" or word == "me" or word == "we" or word == "us":
-					resultString = "Synset('person.n.01')"
-				elif word == "they" or word == "them":
-					resultString = "Synset('physical_entity.n.01')"
-				else:
-					resultString = "Synset('entity.n.01')" 
-			else:
-				resultString = word
-		return resultString, named_entities
+        return str(result)
+        '''
 
 
-	def generalize_verb(self,word,tokens):
-		# This function is to support getEvent functions. Tokens have specific format:tokens[word] = [lemma, POS, NER]
-		word = tokens[word][0]
-		if word == "have": return "own-100" 
+    def generalize_noun(self, word, tokens, named_entities, original_sent):
+        # This function is to support getEvent functions. Tokens have specific format(lemma, pos, ner)
+        lemma = tokens[word][0]
+        pos = tokens[word][1]
+        ner = tokens[word][2]
+        resultString = ""
 
-		classids = verbnet.classids(word)
-		if len(classids) > 0:
-			#return choice based on weight of number of members
-			mems = []
-			for classid in classids:
-				vnclass = verbnet.vnclass(classid)
-				num = len(list(vnclass.findall('MEMBERS/MEMBER')))
-				mems.append(num)
-			mem_count = mems
-			mems = [x/float(sum(mem_count)) for x in mems]
-			return str(choice(classids, 1, p=mems)[0])
-		else:
-			return word
+        if ner != "O": # output of Stanford NER: default values is "O"
+            if ner == "PERSON":
+                if word not in named_entities: # named_entities is a list to store the names of people
+                    named_entities.append(word)
+                resultString = "<NE>"+str(named_entities.index(word))
+            else:
+                resultString = ner 
+        else:
+            word = lemma
+            if "NN" in pos: # and adjective? #changed from only "NN"
+                resultString = self.lookupNoun(word, pos, original_sent) # get the word's ancestor
+            elif "JJ" in pos:
+                resultString = self.lookupAdj(word, pos, original_sent)
+            elif "PRP" in pos:
+                if word == "he" or word == "him":
+                    resultString = "Synset('male.n.02')"
+                elif word == "she" or word == "her":
+                    resultString = "Synset('female.n.02')"
+                elif word == "I" or word == "me" or word == "we" or word == "us":
+                    resultString = "Synset('person.n.01')"
+                elif word == "they" or word == "them":
+                    resultString = "Synset('physical_entity.n.01')"
+                else:
+                    resultString = "Synset('entity.n.01')" 
+            else:
+                resultString = word
+        return resultString, named_entities
 
 
-	def callStanford(self,sentence):
-		# This function can call Stanford CoreNLP tool and support getEvent function.
-		encoding = "utf8"
-		'''cmd = ["java", "-cp", stanford_dir+"/*","-Xmx20g",
-			"edu.stanford.nlp.pipeline.StanfordCoreNLP",
-			"-annotators", "tokenize,ssplit,pos,lemma,depparse,ner", 
-			"-nthreads","10",
-			'-outputFormat', 'json',
-			"-parse.flags", "",
-			'-encoding', encoding,
-			'-model', models+'/edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz'
-		]'''
-		cmd = ["java", "-cp", stanford_dir+"/*","-Xmx20g", "edu.stanford.nlp.pipeline.StanfordCoreNLPClient",
-			"-annotators", "tokenize,ssplit,parse,ner,pos,lemma,depparse", #ner,tokenize,ssplit,pos,lemma,parse,depparse #tokenize,ssplit,pos,lemma,depparse,ner
-			'-outputFormat','json',
-			"-parse.flags", "",
-			'-encoding', encoding,
-			'-model', models+'/edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz',"-backends","localhost:9000,12"]
+    def generalize_verb(self,word,tokens):
+        # This function is to support getEvent functions. Tokens have specific format:tokens[word] = [lemma, POS, NER]
+        word = tokens[word][0]
+        if word == "have": return "own-100" 
 
-		input_ = ""
-		default_options = ' '.join(_java_options)
-		with tempfile.NamedTemporaryFile(mode='wb', delete=False) as input_file:
-			# Write the actual sentences to the temporary input file
-			if isinstance(sentence, compat.text_type) and encoding:
-				input_ = sentence.encode(encoding)
-			input_file.write(input_)
-			input_file.flush()
-			input_file.seek(0)
-			#print(input_file)
-			devnull = open(os.devnull, 'w')
-			out = subprocess.check_output(cmd, stdin=input_file, stderr=devnull)
-			out = out.replace(b'\xc2\xa0',b' ')
-			out = out.replace(b'\xa0',b' ')
-			out = out.replace(b'NLP>',b'')
-			#print(out)
-			# out = out.decode(encoding)
+        classids = verbnet.classids(word)
+        if len(classids) > 0:
+            #return choice based on weight of number of members
+            mems = []
+            for classid in classids:
+                vnclass = verbnet.vnclass(classid)
+                num = len(list(vnclass.findall('MEMBERS/MEMBER')))
+                mems.append(num)
+            mem_count = mems
+            mems = [x/float(sum(mem_count)) for x in mems]
+            return str(choice(classids, 1, p=mems)[0])
+        else:
+            return word
+
+
+    def callStanford(self,sentence):
+        # This function can call Stanford CoreNLP tool and support getEvent function.
+        encoding = "utf8"
+        '''cmd = ["java", "-cp", stanford_dir+"/*","-Xmx20g",
+            "edu.stanford.nlp.pipeline.StanfordCoreNLP",
+            "-annotators", "tokenize,ssplit,pos,lemma,depparse,ner", 
+            "-nthreads","10",
+            '-outputFormat', 'json',
+            "-parse.flags", "",
+            '-encoding', encoding,
+            '-model', models+'/edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz'
+        ]'''
+        cmd = ["java", "-cp", stanford_dir+"/*","-Xmx20g", "edu.stanford.nlp.pipeline.StanfordCoreNLPClient",
+            "-annotators", "tokenize,ssplit,parse,ner,pos,lemma,depparse", #ner,tokenize,ssplit,pos,lemma,parse,depparse #tokenize,ssplit,pos,lemma,depparse,ner
+            '-outputFormat','json',
+            "-parse.flags", "",
+            '-encoding', encoding,
+            '-model', models+'/edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz',"-backends","localhost:9000,12"]
+
+        input_ = ""
+        default_options = ' '.join(_java_options)
+        with tempfile.NamedTemporaryFile(mode='wb', delete=False) as input_file:
+            # Write the actual sentences to the temporary input file
+            if isinstance(sentence, compat.text_type) and encoding:
+                input_ = sentence.encode(encoding)
+            input_file.write(input_)
+            input_file.flush()
+            input_file.seek(0)
+            #print(input_file)
+            devnull = open(os.devnull, 'w')
+            out = subprocess.check_output(cmd, stdin=input_file, stderr=devnull)
+            out = out.replace(b'\xc2\xa0',b' ')
+            out = out.replace(b'\xa0',b' ')
+            out = out.replace(b'NLP>',b'')
+            #print(out)
+            # out = out.decode(encoding)
                         # print(out)
-		os.unlink(input_file.name)
-		# Return java configurations to their default values.
-		config_java(options=default_options, verbose=False)
-		return out
+        os.unlink(input_file.name)
+        # Return java configurations to their default values.
+        config_java(options=default_options, verbose=False)
+        return out
 
 
-	def callStanfordNER(self,sentence):
-		# This function can call Stanford Name Entity Recognizer and support getEvent function.
-		encoding = "utf8"
-		default_options = ' '.join(_java_options)
-		with tempfile.NamedTemporaryFile(mode='wb', delete=False) as input_file:
-			# Write the actual sentences to the temporary input file
-			if isinstance(sentence, compat.text_type) and encoding:
-				input_ = sentence.encode(encoding)
-			input_file.write(input_)
-			input_file.flush()
-			input_file.seek(0)
-			cmd = ["java", "-cp", ner_loc+"/stanford-ner.jar:"+ner_loc+"/lib/*","-Xmx20g",
-						"edu.stanford.nlp.ie.crf.CRFClassifier",
-						"-loadClassifier",ner_loc+"/classifiers/english.all.3class.distsim.crf.ser.gz",
-						'-encoding', encoding,
-						'-textFile', input_file.name,
-						"-ner.useSUTime", "false"
-					]
-			devnull = open(os.devnull, 'w')
-			out = subprocess.check_output(cmd, stderr=devnull)
-			#print(out)
-			out = out.replace(b'\xc2\xa0',b' ')
-			out = out.replace(b'\xa0',b' ')
-			out = out.decode(encoding)
-			#print(out)
-		os.unlink(input_file.name)
-		# Return java configurations to their default values.
-		config_java(options=default_options, verbose=False)
-		return out
+    def callStanfordNER(self,sentence):
+        # This function can call Stanford Name Entity Recognizer and support getEvent function.
+        encoding = "utf8"
+        default_options = ' '.join(_java_options)
+        with tempfile.NamedTemporaryFile(mode='wb', delete=False) as input_file:
+            # Write the actual sentences to the temporary input file
+            if isinstance(sentence, compat.text_type) and encoding:
+                input_ = sentence.encode(encoding)
+            input_file.write(input_)
+            input_file.flush()
+            input_file.seek(0)
+            cmd = ["java", "-cp", ner_loc+"/stanford-ner.jar:"+ner_loc+"/lib/*","-Xmx20g",
+                        "edu.stanford.nlp.ie.crf.CRFClassifier",
+                        "-loadClassifier",ner_loc+"/classifiers/english.all.3class.distsim.crf.ser.gz",
+                        '-encoding', encoding,
+                        '-textFile', input_file.name,
+                        "-ner.useSUTime", "false"
+                    ]
+            devnull = open(os.devnull, 'w')
+            out = subprocess.check_output(cmd, stderr=devnull)
+            #print(out)
+            out = out.replace(b'\xc2\xa0',b' ')
+            out = out.replace(b'\xa0',b' ')
+            out = out.decode(encoding)
+            #print(out)
+        os.unlink(input_file.name)
+        # Return java configurations to their default values.
+        config_java(options=default_options, verbose=False)
+        return out
 
 
-	def getEvent(self):
-	# This is a function that can extract the event format from the sentence given.
-		words = self.sentence.split()
-		original_sent = self.sentence.strip()
-		# print(original_sent)
-		#ner = self.callStanfordNER(original_sent).split() # get the name entities in the sentence
-		#ner_dict = {} # Example: "Sally":"PERSON"
-		#for pair in ner:
-		#	word, label = pair.rsplit("/", 1)
-		#	ner_dict[word] = label
-		#print(ner_dict)
+    def getEvent(self):
+    # This is a function that can extract the event format from the sentence given.
+        words = self.sentence.split()
+        original_sent = self.sentence.strip()
+        # print(original_sent)
+        #ner = self.callStanfordNER(original_sent).split() # get the name entities in the sentence
+        #ner_dict = {} # Example: "Sally":"PERSON"
+        #for pair in ner:
+        #   word, label = pair.rsplit("/", 1)
+        #   ner_dict[word] = label
+        #print(ner_dict)
 
-		json_data = self.callStanford(self.sentence)
+        json_data = self.callStanford(self.sentence)
                 # print(type(json_data))
-		d = json.loads(json_data)
-		all_json = d["sentences"]
-		ner_dict2 = {}
-		for i, sentence in enumerate(all_json):
-			for token in sentence["tokens"]:
-				ner_dict2[token["word"]] = token["ner"]
-		#print(ner_dict2)
+        d = json.loads(json_data)
+        all_json = d["sentences"]
+        ner_dict2 = {}
+        for i, sentence in enumerate(all_json):
+            for token in sentence["tokens"]:
+                ner_dict2[token["word"]] = token["ner"]
+        #print(ner_dict2)
 
-		#print(all_json)
-		#print(len(all_json))
-	
-		for sent_num, sentence in enumerate(all_json): # for each sentence in the entire input
-			tokens = defaultdict(list) 
-			#print(sentence)
-			for token in sentence["tokens"]: 
-				tokens[token["word"]] = [token["lemma"], token["pos"], ner_dict2[token["word"]],token["index"]] # each word in the dictionary has a list of [lemma, POS, NER]
-
-
-			deps = sentence["enhancedPlusPlusDependencies"]	 # retrieve the dependencies
-			named_entities = []
-			verbs = []
-			subjects = []
-			modifiers = []
-			objects = []
-			pos = {}
-			pos["EmptyParameter"] = "None"
-			chainMods = {} # chaining of mods
-			index = defaultdict(list)  #for identifying part-of-speech
-			index["EmptyParameter"] = -1
-			# create events
-			for d in deps:
-				#subject
-				if 'nsubj' in d["dep"] and "RB" not in tokens[d["dependentGloss"]][1]: #adjective? #"csubj" identifies a lot of things wrong 
-					#print(tokens[d["dependentGloss"]][1])
-					if d["governorGloss"] not in verbs:
-						#create new event
-						if not "VB" in tokens[d["governorGloss"]][1]: continue
-						verbs.append(d["governorGloss"])
-						index[d["governorGloss"]] = d["governor"] #adding index
-						subjects.append(d["dependentGloss"])
-						index[d["dependentGloss"]] = d["dependent"] #adding index to subject
-						pos[d["governorGloss"]] = tokens[d["governorGloss"]][1]
-						pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
-						modifiers.append('EmptyParameter')
-						objects.append('EmptyParameter')
-					elif d["governorGloss"] in verbs:
-						if subjects[verbs.index(d["governorGloss"])] == "EmptyParameter": # if verb alrady exist 
-							subjects[verbs.index(d["governorGloss"])] = d["dependentGloss"]
-							index[d["dependentGloss"]] = d["dependent"]
-						else:
-							subjects.append(d["dependentGloss"])
-							index[d["dependentGloss"]] = d["dependent"]
-							verbs.append(d["governorGloss"])
-							index[d["governorGloss"]] = d["governor"]
-							modifiers.append('EmptyParameter')
-							objects.append('EmptyParameter')
-						pos[d["governorGloss"]] = tokens[d["governorGloss"]][1]
-						pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
-					elif d["dependentGloss"] in subjects: # one subject multiple verbs
-						verbs[subjects.index(d["dependentGloss"])] = d["governorGloss"]
-						index[d["governorGloss"]] = d["governor"]
-						pos[d["governorGloss"]] = tokens[d["governorGloss"]][1]
-						pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
-				else: #check to see if we have a subject filled ??
-					if len(subjects) >1:
-						if subjects[-1] == "EmptyParameter":
-							subjects[-1] = subjects[-2]
-					#conjunction of verbs
-					if 'conj' in d["dep"] and 'VB' in tokens[d["dependentGloss"]][1]:
-						if d["dependentGloss"] not in verbs:
-							verbs.append(d["dependentGloss"])
-							pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
-							index[d["dependentGloss"]] = d["dependent"]
-							subjects.append('EmptyParameter')
-							modifiers.append('EmptyParameter')
-							objects.append('EmptyParameter')
-					#conjunction of subjects
-					elif 'conj' in d["dep"] and d["governorGloss"] in subjects: # governor and dependent are both subj. e.g. Amy and Sheldon
-						loc = subjects.index(d["governorGloss"])
-						verb = verbs[loc] #verb already exist. question: should the verb have the same Part-of-Speech tag?
-						subjects.append(d["dependentGloss"])
-						index[d["dependentGloss"]] = d["dependent"]
-						verbs.append(verb)
-						modifiers.append('EmptyParameter')
-						objects.append('EmptyParameter')
-						pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
-					elif 'conj' in d["dep"] and d["governorGloss"] in objects:
-						loc = objects.index(d["governorGloss"])
-						match_verb = verbs[loc] #??? is it a correct way to retrieve the verb?
-						#print(match_verb)
-						temp_verbs = copy.deepcopy(verbs)
-						for i, verb in enumerate(temp_verbs):
-							if match_verb == verb: # what if the verb appears more than one times?
-								subjects.append(subjects[i]) 
-								verbs.append(verb)
-								modifiers.append('EmptyParameter')
-								objects.append(d["dependentGloss"])
-								index[d["dependentGloss"]] = d["dependent"]
-						pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]			
-					# case 1: obj
-					elif 'dobj' in d["dep"] or 'xcomp' == d["dep"]:  #?? 'xcomp' is a little bit tricky
-						if d["governorGloss"] in verbs:
-							#modify that object
-							pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
-							for i, verb in reversed(list(enumerate(verbs))):
-								if verb == d["governorGloss"] and objects[i] == "EmptyParameter":
-									objects[i] = d["dependentGloss"]
-									index[d["dependentGloss"]] = d["dependent"]
-					# case 2: nmod
-					elif ('nmod' in d["dep"] or 'ccomp' in d["dep"] or 'iobj' in d["dep"] or 'dep' in d["dep"]) and 'NN' in tokens[d["dependentGloss"]][1]:
-						if d["governorGloss"] in verbs: # how about PRP?
-							#modify that modifier
-							for i, verb in reversed(list(enumerate(verbs))):
-								if verb == d["governorGloss"] and modifiers[i] == "EmptyParameter":
-									modifiers[i] = d["dependentGloss"]
-									index[d["dependentGloss"]] = d["dependent"]
-							pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
-						elif d["governorGloss"] in chainMods: # is not used actually
-							v = chainMods[d["governorGloss"]]
-							if v in verbs:
-								modifiers[verbs.index(v)] = d["dependentGloss"]
-								index[d["dependentGloss"]] = d["dependent"]
-								pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
-					# PRP			
-					elif ('nmod' in d["dep"] or 'ccomp' in d["dep"] or 'iobj' in d["dep"] or 'dep' in d["dep"]) and 'PRP' in tokens[d["dependentGloss"]][1]:
-						if d["governorGloss"] in verbs: # how about PRP?
-							#modify that modifier
-							for i, verb in reversed(list(enumerate(verbs))):
-								if verb == d["governorGloss"] and modifiers[i] == "EmptyParameter":
-									modifiers[i] = d["dependentGloss"]
-									index[d["dependentGloss"]] = d["dependent"]
-							pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
-						elif d["governorGloss"] in chainMods: # is not used actually
-							v = chainMods[d["governorGloss"]]
-							if v in verbs:
-								modifiers[verbs.index(v)] = d["dependentGloss"]
-								index[d["dependentGloss"]] = d["dependent"]
-								pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
+        #print(all_json)
+        #print(len(all_json))
+    
+        for sent_num, sentence in enumerate(all_json): # for each sentence in the entire input
+            tokens = defaultdict(list) 
+            #print(sentence)
+            for token in sentence["tokens"]: 
+                tokens[token["word"]] = [token["lemma"], token["pos"], ner_dict2[token["word"]],token["index"]] # each word in the dictionary has a list of [lemma, POS, NER]
 
 
+            deps = sentence["enhancedPlusPlusDependencies"]  # retrieve the dependencies
+            named_entities = []
+            verbs = []
+            subjects = []
+            modifiers = []
+            objects = []
+            pos = {}
+            pos["EmptyParameter"] = "None"
+            chainMods = {} # chaining of mods
+            index = defaultdict(list)  #for identifying part-of-speech
+            index["EmptyParameter"] = -1
+            # create events
+            for d in deps:
+                #subject
+                if 'nsubj' in d["dep"] and "RB" not in tokens[d["dependentGloss"]][1]: #adjective? #"csubj" identifies a lot of things wrong 
+                    #print(tokens[d["dependentGloss"]][1])
+                    if d["governorGloss"] not in verbs:
+                        #create new event
+                        if not "VB" in tokens[d["governorGloss"]][1]: continue
+                        verbs.append(d["governorGloss"])
+                        index[d["governorGloss"]] = d["governor"] #adding index
+                        subjects.append(d["dependentGloss"])
+                        index[d["dependentGloss"]] = d["dependent"] #adding index to subject
+                        pos[d["governorGloss"]] = tokens[d["governorGloss"]][1]
+                        pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
+                        modifiers.append('EmptyParameter')
+                        objects.append('EmptyParameter')
+                    elif d["governorGloss"] in verbs:
+                        if subjects[verbs.index(d["governorGloss"])] == "EmptyParameter": # if verb alrady exist 
+                            subjects[verbs.index(d["governorGloss"])] = d["dependentGloss"]
+                            index[d["dependentGloss"]] = d["dependent"]
+                        else:
+                            subjects.append(d["dependentGloss"])
+                            index[d["dependentGloss"]] = d["dependent"]
+                            verbs.append(d["governorGloss"])
+                            index[d["governorGloss"]] = d["governor"]
+                            modifiers.append('EmptyParameter')
+                            objects.append('EmptyParameter')
+                        pos[d["governorGloss"]] = tokens[d["governorGloss"]][1]
+                        pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
+                    elif d["dependentGloss"] in subjects: # one subject multiple verbs
+                        verbs[subjects.index(d["dependentGloss"])] = d["governorGloss"]
+                        index[d["governorGloss"]] = d["governor"]
+                        pos[d["governorGloss"]] = tokens[d["governorGloss"]][1]
+                        pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
+                else: #check to see if we have a subject filled ??
+                    if len(subjects) >1:
+                        if subjects[-1] == "EmptyParameter":
+                            subjects[-1] = subjects[-2]
+                    #conjunction of verbs
+                    if 'conj' in d["dep"] and 'VB' in tokens[d["dependentGloss"]][1]:
+                        if d["dependentGloss"] not in verbs:
+                            verbs.append(d["dependentGloss"])
+                            pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
+                            index[d["dependentGloss"]] = d["dependent"]
+                            subjects.append('EmptyParameter')
+                            modifiers.append('EmptyParameter')
+                            objects.append('EmptyParameter')
+                    #conjunction of subjects
+                    elif 'conj' in d["dep"] and d["governorGloss"] in subjects: # governor and dependent are both subj. e.g. Amy and Sheldon
+                        loc = subjects.index(d["governorGloss"])
+                        verb = verbs[loc] #verb already exist. question: should the verb have the same Part-of-Speech tag?
+                        subjects.append(d["dependentGloss"])
+                        index[d["dependentGloss"]] = d["dependent"]
+                        verbs.append(verb)
+                        modifiers.append('EmptyParameter')
+                        objects.append('EmptyParameter')
+                        pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
+                    elif 'conj' in d["dep"] and d["governorGloss"] in objects:
+                        loc = objects.index(d["governorGloss"])
+                        match_verb = verbs[loc] #??? is it a correct way to retrieve the verb?
+                        #print(match_verb)
+                        temp_verbs = copy.deepcopy(verbs)
+                        for i, verb in enumerate(temp_verbs):
+                            if match_verb == verb: # what if the verb appears more than one times?
+                                subjects.append(subjects[i]) 
+                                verbs.append(verb)
+                                modifiers.append('EmptyParameter')
+                                objects.append(d["dependentGloss"])
+                                index[d["dependentGloss"]] = d["dependent"]
+                        pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]           
+                    # case 1: obj
+                    elif 'dobj' in d["dep"] or 'xcomp' == d["dep"]:  #?? 'xcomp' is a little bit tricky
+                        if d["governorGloss"] in verbs:
+                            #modify that object
+                            pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
+                            for i, verb in reversed(list(enumerate(verbs))):
+                                if verb == d["governorGloss"] and objects[i] == "EmptyParameter":
+                                    objects[i] = d["dependentGloss"]
+                                    index[d["dependentGloss"]] = d["dependent"]
+                    # case 2: nmod
+                    elif ('nmod' in d["dep"] or 'ccomp' in d["dep"] or 'iobj' in d["dep"] or 'dep' in d["dep"]) and 'NN' in tokens[d["dependentGloss"]][1]:
+                        if d["governorGloss"] in verbs: # how about PRP?
+                            #modify that modifier
+                            for i, verb in reversed(list(enumerate(verbs))):
+                                if verb == d["governorGloss"] and modifiers[i] == "EmptyParameter":
+                                    modifiers[i] = d["dependentGloss"]
+                                    index[d["dependentGloss"]] = d["dependent"]
+                            pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
+                        elif d["governorGloss"] in chainMods: # is not used actually
+                            v = chainMods[d["governorGloss"]]
+                            if v in verbs:
+                                modifiers[verbs.index(v)] = d["dependentGloss"]
+                                index[d["dependentGloss"]] = d["dependent"]
+                                pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
+                    # PRP           
+                    elif ('nmod' in d["dep"] or 'ccomp' in d["dep"] or 'iobj' in d["dep"] or 'dep' in d["dep"]) and 'PRP' in tokens[d["dependentGloss"]][1]:
+                        if d["governorGloss"] in verbs: # how about PRP?
+                            #modify that modifier
+                            for i, verb in reversed(list(enumerate(verbs))):
+                                if verb == d["governorGloss"] and modifiers[i] == "EmptyParameter":
+                                    modifiers[i] = d["dependentGloss"]
+                                    index[d["dependentGloss"]] = d["dependent"]
+                            pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
+                        elif d["governorGloss"] in chainMods: # is not used actually
+                            v = chainMods[d["governorGloss"]]
+                            if v in verbs:
+                                modifiers[verbs.index(v)] = d["dependentGloss"]
+                                index[d["dependentGloss"]] = d["dependent"]
+                                pos[d["dependentGloss"]] = tokens[d["dependentGloss"]][1]
 
-				
-			# generalize the words and store them in instance variables
-			for (a,b,c,d) in zip(subjects, verbs, objects, modifiers):
-				pos1 = "None"
-				pos2 = "None"
-				pos3 = "None"
-				pos4 = "None"
-				poslabel = "None"
-				#print((a,b,c,d))
-				num = 0
-				if a != 'EmptyParameter':
-					if index[a] == tokens[a][-1]: #adding part-of-speech
-						pos1 = tokens[a][1]
-					a1, named_entities = self.generalize_noun(a, tokens, named_entities, original_sent)
-					if "<NE>" in a1:
-						self.nouns["<NE>"].append(tokens[a][0])
-					elif a1 == a:
-						a1 = self.generalize_verb(a, tokens) #changed line
-						self.verbs[a1].append(tokens[a][0])
-					else:
-						self.nouns[a1].append(tokens[a][0])
-				else:
-					a1 = a
-				if b != 'EmptyParameter':
-					if index[b] == tokens[b][-1]: #may have issue in looping
-						pos2 = tokens[b][1]
-					b1 = self.generalize_verb(b, tokens) #changed line
-					self.verbs[b1].append(tokens[b][0])
-				else:
-					b1 = b
-				if c != 'EmptyParameter':
-					if index[c] == tokens[c][-1]:
-						pos3 = tokens[c][1]
-					c1, named_entities = self.generalize_noun(c, tokens, named_entities, original_sent)
-					if "<NE>" in c1:
-						self.nouns["<NE>"].append(tokens[c][0])
-					elif c1 == c:
-						c1 = self.generalize_verb(c, tokens) #changed line
-						self.verbs[c1].append(tokens[c][0])
-					else:
-						self.nouns[c1].append(tokens[c][0])
-				else:
-					c1 = c
-				if d == 'EmptyParameter': #adding new lines start. 
-					label = 'EmptyParameter'
-				else:
-					label = 'None' #change from Exist
-					for dep in deps:
-						if b == dep["governorGloss"] and d == dep["dependentGloss"] and "nmod" in dep["dep"]:
-							if ":" in dep["dep"]:
-								label = dep["dep"].split(":")[1]  # shoud this line be added??
-							num = dep['dependent']
-							#print(dep)
-							#print("number:")
-							#print(num)
-							#print(type(num))
-					for dep in deps: # how about obl dependency?
-						if b == dep["governorGloss"] and d == dep["dependentGloss"] and "obl" in dep["dep"]:
-							if ":" in dep["dep"]:
-								label = dep["dep"].split(":")[1]
-							num = dep['dependent']
-							#print(dep)
-								
-					for dep in deps:
-						if "case" in dep["dep"] and d == dep["governorGloss"] and num == dep['governor']: # #what if modifier is related to multiple labels?
-							label = dep["dependentGloss"]	#adding new lines end
-							index[label] = dep["dependent"]
-							#print("label:")
-							#print(num)
-							#print(dep['governor'])
-							#print(type(dep['governor']))
-				if d != 'EmptyParameter':
-					if index[d] == tokens[d][-1]:
-						pos4 = tokens[d][1]
-					d1, named_entities = self.generalize_noun(d, tokens, named_entities, original_sent)
-					if "<NE>" in d1:
-						self.nouns["<NE>"].append(tokens[d][0])
-					else:
-						self.nouns[d1].append(tokens[d][0])
-				else:
-					d1 = d	
-				if label != "EmtpyParameter" and label != "None":
-					if len(tokens[label]) == 4:
-						#print(tokens[label])
-						#print(index[label])
-						if tokens[label][-1] == index[label]:
-							poslabel = tokens[label][1]
-					#print("end")
-				#print(pos)
-				#print(index)
-					#poslabel = tokens[label][1]
-				#self.events.append([a1,b1,c1,label,d1])
-				self.events.append([a1,b1,c1,d1])
-				#print(named_entities)
-				#print([a1,pos[a],pos1,b1,pos[b],pos2,c1,pos[c],pos3,label,poslabel,d1,pos[d],pos4])
-				#self.events.append([a1,pos1,b1,pos2,c1,pos3,label,poslabel,d1,pos4])
-				#self.events.append([a1,pos[a],pos1,b1,pos[b],pos2,c1,pos[c],pos3,label,poslabel,d1,pos[d],pos4])
+
+
+                
+            # generalize the words and store them in instance variables
+            for (a,b,c,d) in zip(subjects, verbs, objects, modifiers):
+                pos1 = "None"
+                pos2 = "None"
+                pos3 = "None"
+                pos4 = "None"
+                poslabel = "None"
+                #print((a,b,c,d))
+                num = 0
+                if a != 'EmptyParameter':
+                    if index[a] == tokens[a][-1]: #adding part-of-speech
+                        pos1 = tokens[a][1]
+                    a1, named_entities = self.generalize_noun(a, tokens, named_entities, original_sent)
+                    if "<NE>" in a1:
+                        self.nouns["<NE>"].append(tokens[a][0])
+                    elif a1 == a:
+                        a1 = self.generalize_verb(a, tokens) #changed line
+                        self.verbs[a1].append(tokens[a][0])
+                    else:
+                        self.nouns[a1].append(tokens[a][0])
+                else:
+                    a1 = a
+                if b != 'EmptyParameter':
+                    if index[b] == tokens[b][-1]: #may have issue in looping
+                        pos2 = tokens[b][1]
+                    b1 = self.generalize_verb(b, tokens) #changed line
+                    self.verbs[b1].append(tokens[b][0])
+                else:
+                    b1 = b
+                if c != 'EmptyParameter':
+                    if index[c] == tokens[c][-1]:
+                        pos3 = tokens[c][1]
+                    c1, named_entities = self.generalize_noun(c, tokens, named_entities, original_sent)
+                    if "<NE>" in c1:
+                        self.nouns["<NE>"].append(tokens[c][0])
+                    elif c1 == c:
+                        c1 = self.generalize_verb(c, tokens) #changed line
+                        self.verbs[c1].append(tokens[c][0])
+                    else:
+                        self.nouns[c1].append(tokens[c][0])
+                else:
+                    c1 = c
+                if d == 'EmptyParameter': #adding new lines start. 
+                    label = 'EmptyParameter'
+                else:
+                    label = 'None' #change from Exist
+                    for dep in deps:
+                        if b == dep["governorGloss"] and d == dep["dependentGloss"] and "nmod" in dep["dep"]:
+                            if ":" in dep["dep"]:
+                                label = dep["dep"].split(":")[1]  # shoud this line be added??
+                            num = dep['dependent']
+                            #print(dep)
+                            #print("number:")
+                            #print(num)
+                            #print(type(num))
+                    for dep in deps: # how about obl dependency?
+                        if b == dep["governorGloss"] and d == dep["dependentGloss"] and "obl" in dep["dep"]:
+                            if ":" in dep["dep"]:
+                                label = dep["dep"].split(":")[1]
+                            num = dep['dependent']
+                            #print(dep)
+                                
+                    for dep in deps:
+                        if "case" in dep["dep"] and d == dep["governorGloss"] and num == dep['governor']: # #what if modifier is related to multiple labels?
+                            label = dep["dependentGloss"]   #adding new lines end
+                            index[label] = dep["dependent"]
+                            #print("label:")
+                            #print(num)
+                            #print(dep['governor'])
+                            #print(type(dep['governor']))
+                if d != 'EmptyParameter':
+                    if index[d] == tokens[d][-1]:
+                        pos4 = tokens[d][1]
+                    d1, named_entities = self.generalize_noun(d, tokens, named_entities, original_sent)
+                    if "<NE>" in d1:
+                        self.nouns["<NE>"].append(tokens[d][0])
+                    else:
+                        self.nouns[d1].append(tokens[d][0])
+                else:
+                    d1 = d  
+                if label != "EmtpyParameter" and label != "None":
+                    if len(tokens[label]) == 4:
+                        #print(tokens[label])
+                        #print(index[label])
+                        if tokens[label][-1] == index[label]:
+                            poslabel = tokens[label][1]
+                    #print("end")
+                #print(pos)
+                #print(index)
+                    #poslabel = tokens[label][1]
+                #self.events.append([a1,b1,c1,label,d1])
+                self.events.append([a1,b1,c1,d1])
+                #print(named_entities)
+                #print([a1,pos[a],pos1,b1,pos[b],pos2,c1,pos[c],pos3,label,poslabel,d1,pos[d],pos4])
+                #self.events.append([a1,pos1,b1,pos2,c1,pos3,label,poslabel,d1,pos4])
+                #self.events.append([a1,pos[a],pos1,b1,pos[b],pos2,c1,pos[c],pos3,label,poslabel,d1,pos[d],pos4])
 
 #line = "People's properties are protected by law."
 line = "There is an unguarded exit to the east."
@@ -524,8 +524,8 @@ print(maker.events)
 output = []
 quit()
 for event in maker.events:
-	sentence = " ".join(event)
-	f.write(sentence+" @@@@ "+line)
+    sentence = " ".join(event)
+    f.write(sentence+" @@@@ "+line)
 quit()
-	#print(sentence+"@@@@"+line)
+    #print(sentence+"@@@@"+line)
 
