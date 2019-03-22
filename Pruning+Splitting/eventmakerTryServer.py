@@ -516,15 +516,17 @@ class eventMaker:
                 #self.events.append([a1,pos1,b1,pos2,c1,pos3,label,poslabel,d1,pos4])
                 #self.events.append([a1,pos[a],pos1,b1,pos[b],pos2,c1,pos[c],pos3,label,poslabel,d1,pos[d],pos4])
 
-#line = "People's properties are protected by law."
-line = "There is an unguarded exit to the east."
-maker = eventMaker(line)
-maker.getEvent()
-print(maker.events)
-output = []
-quit()
-for event in maker.events:
-    sentence = " ".join(event)
-    f.write(sentence+" @@@@ "+line)
-quit()
-    #print(sentence+"@@@@"+line)
+if __name__ == "__main__":
+    print("pork")
+    #line = "People's properties are protected by law."
+    line = "There is an unguarded exit to the east."
+    maker = eventMaker(line)
+    maker.getEvent()
+    print(maker.events)
+    output = []
+    quit()
+    for event in maker.events:
+        sentence = " ".join(event)
+        f.write(sentence+" @@@@ "+line)
+    quit()
+        #print(sentence+"@@@@"+line)
