@@ -297,10 +297,10 @@ class parseLine(object):
 #inp = "(ROOT (S (S (VP (VBG Fleeing) (PP (IN from) (NP (DT the) (VBN perceived) (NN threat))))) (, ,) (NP (PRP she)) (VP (VBZ runs) (PP (PP (IN off) (NP (DT the) (NN train))) (, ,) (PP (IN through) (NP (DT the) (JJ deserted) (NN subway) (NN station))) (, ,) (CC and) (PP (IN onto) (NP (NP (DT the) (NN street)) (SBAR (WHADVP (WRB where)) (S (NP (PRP she)) (VP (VBZ gets) (S (S (VP (VBN attacked) (PP (IN in) (NP (DT a) (JJ dark) (NN alley))) (PP (IN by) (NP (NP (DT the) (VBG quacking) (NN maniac)) (, ,) (SBAR (WHNP (WP who)) (S (ADVP (RB brutally)) (VP (VBZ stabs) (NP (PRP her)) (PP (IN in) (NP (DT the) (NN leg)))))))))) (CC and) (S (VP (VBG slashes) (NP (PRP$ her) (NNS hands) (CC and) (NNS arms)) (SBAR (IN as) (S (NP (PRP she)) (VP (VBZ tries) (S (VP (TO to) (VP (VB defend) (NP (PRP herself)))))))))))))))))) (. .)));Fleeing from the perceived threat, she runs off the train, through the deserted subway station, and onto the street where she gets attacked in a dark alley by the quacking maniac, who brutally stabs her in the leg and slashes her hands and arms as she tries to defend herself."
 inp = "Fleeing from the perceived threat, she runs off the train, through the deserted subway station, and onto the street where she gets attacked in a dark alley by the quacking maniac, who brutally stabs her in the leg and slashes her hands and arms as she tries to defend herself."
 f = open("parsetree.txt","w")
-inp2 = "I am going to school."
+# inp2 = "I am going to school."
 parser = parseLine()
 parser.getTree(inp)
-parser.getTree(inp2)
+# parser.getTree(inp2)
 print("###################After getting parsed tree...####################")
 print(parser.parsedSent)
 print("\n")

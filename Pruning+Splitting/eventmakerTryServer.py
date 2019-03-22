@@ -212,9 +212,9 @@ class eventMaker:
         default_options = ' '.join(_java_options)
         with tempfile.NamedTemporaryFile(mode='wb', delete=False) as input_file:
             # Write the actual sentences to the temporary input file
-            if isinstance(sentence, compat.text_type) and encoding:
-                input_ = sentence.encode(encoding)
-            input_file.write(input_)
+            # if isinstance(sentence, compat.text_type) and encoding:
+                # input_ = sentence.encode(encoding)
+            input_file.write(sentence)
             input_file.flush()
             input_file.seek(0)
             #print(input_file)
