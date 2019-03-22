@@ -1,20 +1,22 @@
-import os
-import subprocess
-from nltk.internals import find_jar, find_jar_iter, config_java, java, _java_options, find_jars_within_path
-import tempfile
 from nltk import compat
+from nltk.internals import find_jar, find_jar_iter, config_java, java, _java_options, find_jars_within_path
+import os
 import re
+import subprocess
+import sys
+import tempfile
 
 # be sure to symlink to your correct paths
-stanford_dir = "../stanford-corenlp-full-2018-10-05"
-models       = "../coreNLP-support/"
+core_nlp_dir = "../stanford-corenlp-full-2018-10-05"
+models_dir   = "../coreNLP-support/"
 work_dir     = "../ps-work/"
 
-# input_file    = work_dir + 'plot_summaries.txt'
-# input_file    = work_dir + 'miniSents.txt' #'SCIFI-CORPUS-noQuotes.txt'
-input_file    = work_dir + 'plot_summaries_trimmed.txt'
-output_file   = work_dir + 'miniSents-parsed.txt' #'scifi_parsed.txt'
-sentence_file = work_dir + 'miniSents-sentences.txt' #'scifi_sentences.txt'
+in_file_name  = 'plots_full.txt'             # 3 lines full text
+# in_file_name  = 'plot_summaries.txt'         # 42,000 lines full text
+# in_file_name  = 'plot_summaries_trimmed.txt' # 67 lines trimmed text
+input_file    = work_dir + in_file_name
+output_file   = work_dir + in_file_name.split(".",1)[0] + '-parsed.txt' # output from corenlp server
+sentence_file = work_dir + in_file_name.split(".",1)[0] + '-sents.txt' # lines after removePunct()
 
 def removePunct(sentence):
     final_sentences = []
@@ -69,37 +71,44 @@ def removePunct(sentence):
             final_sentences.append(sentence)
     return "".join(final_sentences)
 
-
 def callStanford(sentence):
     # This function can call Stanford CoreNLP tool and support getEvent function.
     encoding = "utf8"
-    cmd = ["java", "-cp", stanford_dir+"/*","-Xmx20g", "edu.stanford.nlp.pipeline.StanfordCoreNLPClient",
-        "-annotators", "tokenize,ssplit,parse,ner,pos,lemma,depparse",
+    cmd = ["java", "-cp", core_nlp_dir + "/*", "-Xmx4g",
+        "edu.stanford.nlp.pipeline.StanfordCoreNLPClient",
+        # "-annotators", "tokenize", # 1.34s
+        # "-annotators", "ssplit",   # 1.16s
+        # "-annotators", "parse",    # (3.65s empty parse), (2.1s empty parse), crash, hang, hang...
+        # "-annotators", "ner",      # 14.70, 19.11, 3.31, 6.239s
+        # "-annotators", "pos",      # 3.05, 1.4, 1.3s
+        # "-annotators", "lemma",    # 1.29s
+        # "-annotators", "depparse", # 28.01, 2.55, 18.57s
+        # "-annotators", "ssplit,tokenize,ner,pos,lemma,depparse", # 6.386, 4.77s
+        # "-annotators", "lemma,ssplit,tokenize,ner,pos,depparse", # 6.386s
+        "-annotators", "tokenize,ssplit,parse,ner,pos,lemma,depparse", # crash, 36, hang,..., 37s
         '-outputFormat','json',
         "-parse.flags", "",
         '-encoding', encoding,
-        '-model', models+'/edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz',"-backends","localhost:9000,12"]
-    input_ = ""
+        '-model', models_dir + '/edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz',
+        "-backends","localhost:9000"]
     default_options = ' '.join(_java_options)
     with tempfile.NamedTemporaryFile(mode='wb', delete=False) as temp_file:
-        # Write the actual sentences to the temporary input file
-        #if isinstance(sentence, compat.text_type) and encoding:
-        #   input_ = sentence.encode(encoding)
         temp_file.write(sentence)
         temp_file.flush()
         temp_file.seek(0)
-        print(sentence)
-        devnull = open(os.devnull, 'w')
-        out = subprocess.check_output(cmd, stdin=temp_file, stderr=devnull)
+        err_out = sys.stderr
+        # err_out = os.devnull # suppress client error noise
+        try:
+            out = subprocess.check_output(cmd, stdin=temp_file, stderr=err_out)
+        except subprocess.CalledProcessError as err:
+            print("openNLP CLIENT ERROR: ", err.errorcode)
+            return
         out = out.replace(b'\xc2\xa0',b' ')
         out = out.replace(b'\xa0',b' ')
         out = out.replace(b'NLP>',b'')
-        print(out)
         out = out.decode(encoding)
-        #print(out)
-    os.unlink(temp_file.name)
-    # Return java configurations to their default values.
-    config_java(options=default_options, verbose=False)
+        os.unlink(temp_file.name)
+    config_java(options=default_options, verbose=False) # Return java config to default values
     return out
 
 write_file = open(output_file, "w")
@@ -114,6 +123,7 @@ for line in open(input_file, 'r').readlines():
             result = callStanford(sentence+".")
             sent_file.write(sentence+".\n")
             write_file.write((result+",\n").encode('utf8'))
+
 write_file.write("]\n}") ###MAKE SURE TO GET RID OF THAT LAST ,
 write_file.close()
 sent_file.close()
