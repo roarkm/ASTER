@@ -4,16 +4,16 @@ Data pre-processing.
 
 ## Current Status
 
-`python corenlp.py` runs without error using either a dummy miniSents.txt file or plot_summaries.txt
-as input, however the generated file miniSents-parsed.txt appears to contain no useful information;
-i.e.`python corenlp.py` produces a miniSents-parsed.txt file with empty parses.
+`python corenlp.py`
+coreNLP server (despite upping the available memory to 12g) still crashes due to heap memory limits
+when parsing a full plot summary.
+Truncating the plot summaries helps (but we need to parse an entire summary for the paper)
+Even with truncated plot summaries, the parsing still fails sometimes (empty parse responses and
+loooong runtimes). Will investigate reducing the number of annotators used
+(see https://stanfordnlp.github.io/CoreNLP/memory-time.html) and adding more memory.
 
-`python dataCleaning.py` errors on
-File "/home/m/dev/ASTER/Pruning+Splitting/eventmakerTryServer.py", line 282, in getEvent
-(bottom of stack trace: ValueError: No JSON object could be decoded).
-This might be related to miniSents-parsed.txt having empty parses as mentioned above?
-
-TODO: investigate the above error.
+`python dataCleaning.py` now runs without error on the hardcoded text (on line 298).
+Still need to feed in the results from `python corenlp.py`.
 
 ## Dependencies
 **Corpus Text**
@@ -93,11 +93,6 @@ installation unecessary (probably).
 After install use the standard `source .venv/bin/activate` and `deactivate` virtualenv helpers.
 
 To start a Stanford CoreNLP server, run: `sh runNLPserver.sh`. (visit http://localhost:9000 to test)
-
-Note: Running stanford-coreNLP server as a separate process appears to be unecessary;
-P&S code spawns a new java process for each sentence.
-This is an inefficient usage do process creation overhead but gets the job done.
-We can investigate refactoring the code to make API calls over http.
 
 Run `python corenlp.py` to parse your data and then you can run `python dataCleaning.py`
 to prune and split.
