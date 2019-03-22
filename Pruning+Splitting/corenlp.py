@@ -1,5 +1,3 @@
-# subprocess commands for running corenlp stuff
-
 import os
 import subprocess
 from nltk.internals import find_jar, find_jar_iter, config_java, java, _java_options, find_jars_within_path
@@ -7,22 +5,16 @@ import tempfile
 from nltk import compat
 import re
 
-stanford_dir = "/home/matthieu/Project/corenlp/stanford-corenlp-full-2018-10-05"
-models       = "/home/matthieu/Project/corenlp/coreNLP-support"
+# be sure to symlink to your correct paths
+stanford_dir = "../stanford-corenlp-full-2018-10-05"
+models       = "../coreNLP-support/"
+work_dir     = "../ps-work/"
 
-# TODO: Tested on dummy 'miniSents.txt' file (with some simple sentences).
-# This should be the raw movie-summary text from wikipedia?
-WORK_DIR      = "../../ASTER/ps-work/"
-# input_file    = WORK_DIR + 'plot_summaries2.txt' # cp from http://www.cs.cmu.edu/~ark/personas/
-input_file    = WORK_DIR + 'plot_summaries.txt' # cp from http://www.cs.cmu.edu/~ark/personas/
-# input_file    = WORK_DIR + 'miniSents.txt' #'SCIFI-CORPUS-noQuotes.txt'
-output_file   = WORK_DIR + 'miniSents-parsed.txt' #'scifi_parsed.txt'
-sentence_file = WORK_DIR + 'miniSents-sentences.txt' #'scifi_sentences.txt'
-
-# sentence_postfix = "-sentences.txt"
-# output_postfix   = "-parsed.txt"
-# output_file   = WORK_DIR + input_file + output_postfix
-# sentence_file = WORK_DIR + input_file + sentence_postfix
+# input_file    = work_dir + 'plot_summaries.txt'
+# input_file    = work_dir + 'miniSents.txt' #'SCIFI-CORPUS-noQuotes.txt'
+input_file    = work_dir + 'plot_summaries_trimmed.txt'
+output_file   = work_dir + 'miniSents-parsed.txt' #'scifi_parsed.txt'
+sentence_file = work_dir + 'miniSents-sentences.txt' #'scifi_sentences.txt'
 
 def removePunct(sentence):
     final_sentences = []

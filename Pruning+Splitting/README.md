@@ -44,11 +44,15 @@ TODO: confirm 2018 release compatibility.
 
 `unzip stanford-corenlp-full-2018-10-05.zip`
 
+`ln -s stanford-corenlp-full-2018-10-05 ASTER`
+
 corenlp.py expects to find englishPCFG.ser.gz so extract it (will update path strings in corenlp.py)
 
 `mkdir coreNLP-support`
 
 `cp stanford-corenlp-full-2018-10-05/stanford-corenlp-3.9.2-models.jar coreNLP-support`
+
+`ln -s coreNLP-support ASTER`
 
 `cd coreNLP-support`
 
@@ -76,6 +80,8 @@ installation unecessary (probably).
 `wget https://nlp.stanford.edu/software/stanford-ner-2018-10-16.zip`
 
 `unzip stanford-ner-2018-10-16.zip`
+
+`ln -s stanford-ner-2018-10-16 ASTER`
 
 ## Usage
 **Install & Setup**

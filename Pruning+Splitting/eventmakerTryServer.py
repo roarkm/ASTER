@@ -21,10 +21,10 @@ import json
 from numpy.random import choice
 from nltk.wsd import lesk
 
-# necessary parameters
-stanford_dir = "/home/matthieu/Project/corenlp/stanford-corenlp-full-2018-10-05"
-models       = "/home/matthieu/Project/corenlp/coreNLP-support"
-ner_loc      = "/home/matthieu/Project/corenlp/coreNLP-support/stanford-ner-2018-10-16"
+# be sure to symlink to your correct paths
+stanford_dir = "../stanford-corenlp-full-2018-10-05"
+models       = "../coreNLP-support"
+ner_loc      = "../stanford-ner-2018-10-16"
 
 verbnet = nltk.corpus.VerbnetCorpusReader('../Event_Creation/verbnet',
     ['absorb-39.8.xml', 'continue-55.3.xml', 'hurt-40.8.3.xml', 'remove-10.1.xml', 'accept-77.xml',
