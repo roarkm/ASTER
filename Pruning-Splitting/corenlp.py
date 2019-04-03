@@ -7,13 +7,12 @@ import sys
 import tempfile
 
 # be sure to symlink to your correct paths
-core_nlp_dir = "../stanford-corenlp-full-2018-10-05"
-models_dir   = "../coreNLP-support/"
-work_dir     = "../ps-work/"
+core_nlp_dir = "../stanford-corenlp-full-2016-10-31"
+models_dir   = "../coreNLP-support"
+work_dir     = "../../test-data/ps/t1/"
 
-in_file_name  = 'plots_full.txt'             # 3 lines full text
-# in_file_name  = 'plot_summaries.txt'         # 42,000 lines full text
-# in_file_name  = 'plot_summaries_trimmed.txt' # 67 lines trimmed text
+in_file_name  = 'raw-in.txt'
+
 input_file    = work_dir + in_file_name
 output_file   = work_dir + in_file_name.split(".",1)[0] + '-parsed.txt' # output from corenlp server
 sentence_file = work_dir + in_file_name.split(".",1)[0] + '-sents.txt' # lines after removePunct()
