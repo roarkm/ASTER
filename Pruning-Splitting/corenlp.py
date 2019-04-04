@@ -73,30 +73,30 @@ def removePunct(sentence):
 def callStanford(sentence):
     # This function can call Stanford CoreNLP tool and support getEvent function.
     encoding = "utf8"
-    cmd = ["java", "-cp", core_nlp_dir + "/*", "-Xmx4g",
-        "edu.stanford.nlp.pipeline.StanfordCoreNLPClient",
-        # "-annotators", "tokenize", # 1.34s
-        # "-annotators", "ssplit",   # 1.16s
-        # "-annotators", "parse",    # (3.65s empty parse), (2.1s empty parse), crash, hang, hang...
-        # "-annotators", "ner",      # 14.70, 19.11, 3.31, 6.239s
-        # "-annotators", "pos",      # 3.05, 1.4, 1.3s
-        # "-annotators", "lemma",    # 1.29s
-        # "-annotators", "depparse", # 28.01, 2.55, 18.57s
-        # "-annotators", "ssplit,tokenize,ner,pos,lemma,depparse", # 6.386, 4.77s
-        # "-annotators", "lemma,ssplit,tokenize,ner,pos,depparse", # 6.386s
-        "-annotators", "tokenize,ssplit,parse,ner,pos,lemma,depparse", # crash, 36, hang,..., 37s
-        '-outputFormat','json',
-        "-parse.flags", "",
-        '-encoding', encoding,
-        '-model', models_dir + '/edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz',
-        "-backends","localhost:9000"]
+    cmd = ["java", "-cp", core_nlp_dir + "/*", "-mx20g",
+            "edu.stanford.nlp.pipeline.StanfordCoreNLPClient",
+            # "-annotators", "tokenize", # 1.34s
+            # "-annotators", "ssplit",   # 1.16s
+            # "-annotators", "parse",    # (3.65s empty parse), (2.1s empty parse), crash, hang, hang...
+            # "-annotators", "ner",      # 14.70, 19.11, 3.31, 6.239s
+            # "-annotators", "pos",      # 3.05, 1.4, 1.3s
+            # "-annotators", "lemma",    # 1.29s
+            # "-annotators", "depparse", # 28.01, 2.55, 18.57s
+            # "-annotators", "ssplit,tokenize,ner,pos,lemma,depparse", # 6.386, 4.77s
+            # "-annotators", "lemma,ssplit,tokenize,ner,pos,depparse", # 6.386s
+            "-annotators", "tokenize,ssplit,parse,ner,pos,lemma,depparse", # crash, 36, hang,..., 37s
+            '-outputFormat','json',
+            "-parse.flags", "",
+            '-encoding', encoding,
+            '-model', models_dir + '/edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz',
+            "-backends","localhost:9000"]
     default_options = ' '.join(_java_options)
     with tempfile.NamedTemporaryFile(mode='wb', delete=False) as temp_file:
         temp_file.write(sentence)
         temp_file.flush()
         temp_file.seek(0)
         err_out = sys.stderr
-        # err_out = os.devnull # suppress client error noise
+        # err_out = open(os.devnull, 'w') # suppress client error noise
         try:
             out = subprocess.check_output(cmd, stdin=temp_file, stderr=err_out)
         except subprocess.CalledProcessError as err:
@@ -106,7 +106,7 @@ def callStanford(sentence):
         out = out.replace(b'\xa0',b' ')
         out = out.replace(b'NLP>',b'')
         out = out.decode(encoding)
-        os.unlink(temp_file.name)
+    os.unlink(temp_file.name)
     config_java(options=default_options, verbose=False) # Return java config to default values
     return out
 
@@ -117,11 +117,14 @@ for line in open(input_file, 'r').readlines():
     if "<EOS>" in line:
         sent_file.write("<EOS>\n")
     else:
-        sentences = removePunct(line)
-        for sentence in sentences.split(". "):
-            result = callStanford(sentence+".")
-            sent_file.write(sentence+".\n")
-            write_file.write((result+",\n").encode('utf8'))
+        result = callStanford(line+".")
+        sent_file.write(line+".\n")
+        write_file.write((result+",\n").encode('utf8'))
+        # sentences = removePunct(line)
+        # for sentence in sentences.split(". "):
+            # result = callStanford(sentence+".")
+            # sent_file.write(sentence+".\n")
+            # write_file.write((result+",\n").encode('utf8'))
 
 write_file.write("]\n}") ###MAKE SURE TO GET RID OF THAT LAST ,
 write_file.close()
