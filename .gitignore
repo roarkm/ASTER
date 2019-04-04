@@ -1,8 +1,8 @@
 */**/*.pyc
 */**/*.venv
-stanford-corenlp-full-2018-10-05
+*/**/*.swp
+*.swp
 stanford-ner-2018-10-16
 coreNLP-support
-ps-work
 stanford-corenlp-full-2016-10-31
 stanford-corenlp-full-2018-10-05
