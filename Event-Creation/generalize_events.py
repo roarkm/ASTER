@@ -12,7 +12,7 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 
 parser = argparse.ArgumentParser(description='Create files of events')
-parser.add_argument("-G", '--genreNum', type=int, help="integer of the genre that you want to get the stories of", default=1)
+parser.add_argument("-G", '--genreNum', type=int, help="integer of the genre that you want to get the stories of", default=0)
 args = parser.parse_args()
 genreNum = args.genreNum
 
@@ -161,8 +161,8 @@ def generalize_noun(word, tokens, named_entities):
 #read in ner files
 
 #for each pair of parse/ner files (for each genre)
-json_file = "cmu_parsed/genre_"+str(genreNum)+"_sents.txt.json"
-ner_file = open("cmu_ner/genre_"+str(genreNum)+"_sents.txt.ner", 'r')
+json_file = "genre_"+str(genreNum)+"_sents.txt.json"
+ner_file = open("genre_"+str(genreNum)+"_sents.txt.ner", 'r')
 ner = [line.strip().split(' ') for line in ner_file.readlines()] 
 original_sents = [" ".join([word.split("/")[0] for word in sentence]) for sentence in ner]
 ner_dict = [] #json sentence index should match up with sentence index here; list of dictionaries with {word:label} pairs for each sentence
@@ -178,7 +178,7 @@ with open(json_file) as json_data:
     all_json = d["sentences"]
     #story_count = 0
     outfile = open("genre_"+str(genreNum)+"_events.txt", "w")
-    
+
     for sent_num, sentence in enumerate(all_json): # for each sentence in the entire genre
         new_story = False
         tokens = defaultdict(list)#TODO: atm, assuming same POS for same word in sentence
