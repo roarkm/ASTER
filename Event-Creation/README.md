@@ -1,6 +1,6 @@
 # Event Creation
 
-Data pre-processing.
+Creates Event Representations
 
 ## Usage
 **Install & Setup**
@@ -9,21 +9,6 @@ Data pre-processing.
 
 `unzip genre_0_sents.txt.zip`
 (Outputs a json file. I think this is a sample of the structured data output from Pruning-Splitting)
-
-**Running**
-
-## Current Status
-
-`python corenlp.py`
-coreNLP server (despite upping the available memory to 12g) still crashes due to heap memory limits
-when parsing a full plot summary.
-Truncating the plot summaries helps (but we need to parse an entire summary for the paper)
-Even with truncated plot summaries, the parsing still fails sometimes (empty parse responses and
-loooong parsetimes). Will investigate reducing the number of annotators used
-(see https://stanfordnlp.github.io/CoreNLP/memory-time.html).
-
-`python dataCleaning.py` now runs without error on the hardcoded text (on line 298).
-Still need to feed in the results from `python corenlp.py`.
 
 
 **Event Creation (From Top Level README)**
