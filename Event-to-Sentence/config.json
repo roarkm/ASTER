@@ -12,10 +12,10 @@
     "evaluate": false
   },
   "data": {
-    "src": "train_input.txt",
-    "trg": "train_output.txt",
-    "test_src": "test_input.txt",
-    "test_trg": "test_output.txt",
+    "src": "/home/aster/dev/890-proj/ASTER/Event-to-Sentence/data/1/originalEvent-SentenceTest_input.txt",
+    "trg": "/home/aster/dev/890-proj/ASTER/Event-to-Sentence/data/1/train_output.txt",
+    "test_src": "/home/aster/dev/890-proj/ASTER/Event-to-Sentence/data/1/originalEvent-SentenceTest_input.txt",
+    "test_trg": "/home/aster/dev/890-proj/ASTER/Event-to-Sentence/data/1/test_output.txt",
     "batch_size": 80,
     "n_words_trg": 30000,
     "valid_batch_size": 80,

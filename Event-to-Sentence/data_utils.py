@@ -204,8 +204,9 @@ def get_minibatch(
             for line in lines[index:index + batch_size]
         ]
     lines = [line[:max_len] for line in lines]
-
+    print(lines)
     lens = [len(line) for line in lines]
+    print(lens)
     max_len = max(lens)
 
     input_lines = [
